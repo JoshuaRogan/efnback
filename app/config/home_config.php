@@ -9,7 +9,7 @@
  */
 
 class config extends global_config{
-	public static $pageTitle 			= "Home Page"; 
+	public static $pageTitle 			= "EFN Back "; 
 	public static $pageDescription 		= "Description for the homepage"; 
 
 	public static $stylesheets 			= array(); //Include stylesheets 
