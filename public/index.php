@@ -151,7 +151,7 @@ if(!config::$render){
 		//Pring errors if DEBUG is true and contains data
 		if(config::$debug){
 			if(isset($_DEBUG) && count($_DEBUG) > 0){
-				echo "<br /><div class='container-fluid'><pre class='pre-scrollable col-md-12'>";
+				echo "<br /><div class='container-fluid'><pre class='pre-scrollable col-md-12'><h3>Debug Console</h3>";
 				var_dump($_DEBUG);
 				echo "</pre></div>";
 			}
