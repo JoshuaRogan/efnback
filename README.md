@@ -1,18 +1,13 @@
-Simple Static Web Framework
+EFNBack Program 
 ==============
-Simple PHP static web framework. All pages are routed through the index.php page setting the GET['page'] variable to different pages to allow multiple pages. 
+JavaScript application that displays keystrokes to press recording the reaction time and accuracy.
 
-
-Features
---------------
-- The entire project has an APPVARS file that contains global information 
-- Each page has an associated config file named "controller-foo.php" that contains page title, description, css/js to include, optional headers and footers.
-- Each page can but doesn't need to have an associated model that can define various aspects of a potential object. However, since this is meant to be a mostly static framework it can be ignored. 
-- Set up with GRUNT to allow automatic LESS compiling/watching by running the CLI command grunt in the project directory
 
 Upcoming Features 
 --------------
-- Create scripts to automatically create associated config files with each page and automatically fill out the required variables.
+- *2 memory conditions: 0 back (press to M) and 2 back (A-B-A pattern).
+- *4 face conditions: no face, fear face, happy face, neutral face.
+- Record reaction time and accuracy for each memory and face condition. 
 
 
 
