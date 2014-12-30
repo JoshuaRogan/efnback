@@ -42,6 +42,8 @@ $uid = generateUID();
 		<span id="user-id">Potential UID: <?php echo $uid ?></span> <br />
 
 		<span id="char-pressed">Keyboard listening...</span> <br />
+		<input type='text' id='foo'><div onclick='$("#foo").focus();'><small>iOS Click Above to open keyboard</small></div>
+
 
 		<span id="efn-character">a + b</span> <br />
 
