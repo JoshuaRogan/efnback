@@ -22,11 +22,27 @@ The task should always start with 0 back no face block but the rest of them shou
 Please do let me know if you have any questions or need any more information.
 
 */
+
+/**
+ *	The current UID will be combined with a date to make it more unique but memorable. 
+ *	
+ *
+ */
+function generateUID(){
+	return rand(0,99999);
+}
+
+
+$uid = generateUID(); 
 ?>
 
 <div id="efn_contaier" class="row text-center center-block"> 
 
 	<div class="col-xs-12">
+		<span id="user-id">Potential UID: <?php echo $uid ?></span> <br />
+
+		<span id="char-pressed">Keyboard listening...</span> <br />
+
 		<span id="efn-character">a + b</span> <br />
 
 
