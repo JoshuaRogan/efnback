@@ -1,12 +1,15 @@
 <?php 
 error_reporting(-1);
 ini_set('display_errors', 'On');
+ini_set('error_reporting', E_ALL);
+
+
 
 //Autoloading of classes
 function __autoload($class_name) {
 	
 	if(file_exists("../lib/util/$class_name" . ".php")){
-		require_once ("../lib/util/$class_name" . ".php");
+		require("../lib/util/$class_name" . ".php");
 	}
 
 	//Check more locations here 
@@ -15,7 +18,8 @@ function __autoload($class_name) {
 
 }
 
-//Set $page to the page in the url or default to home
+
+/************************************ROUTING************************************/
 if(!isset($_GET['page'])){
 	$page = 'home'; 	//Default
 }
@@ -25,26 +29,53 @@ else{
 	}
 	else {
 		new alerts("<p>The page \"" .$_GET['page'] . "\" doesn't exist! <strong>You have been redirected to the home page!</strong></p>", "alert-danger");
+		$_DEBUG[] = "The page \"" .$_GET['page'] . "\" doesn't exist! <strong>You have been redirected to the home page!";
 		$page = 'home';	 //Default 
 	}
 }
-
 $_DEBUG[] =  "The Current page: $page \n"; 
+/************************************ROUTING************************************/
 
 
-//Require the config files 
+
+
+
+/************************************CONFIG************************************/
 require_once("../app/config/GLOBAL_CONFIG.php");	//require the global config class
-if(file_exists("../app/config/" . $page . "_config.php")){
-	require_once("../app/config/" . $page . "_config.php");	//Require this pages config class 
+if(file_exists("../app/config/" . $page . "_config.php"))
+	require("../app/config/" . $page . "_config.php");	//Require this pages config class 
+
+else{
+	new alerts("<p>The page \"" . $_GET['page'] . "\" doesn't have a config file! Loading the default config. </p>", "alert-danger");
+	$_DEBUG[] = "<p>The page \"" . $_GET['page'] . "\" doesn't have a config file! Loading the default config.";
+	require("../app/config/default_config.php");	//Require this pages config class 
+}
+/************************************CONFIG************************************/
+
+
+/************************************MODEL************************************/
+require "../app/models/model.php";	//The generic model 
+// Require the model they exist (doesn't have to for mostly static webpages)
+if(file_exists("../app/models/$page.php")) require "../app/models/$page.php";
+else{
+	$_DEBUG[] = "There is no model for $page";
+}
+/************************************MODEL************************************/
+
+/************************************CONTROLLER************************************/
+require "../app/controllers/controller.php";	//The generic controller 
+// Require the model they exist (doesn't have to for mostly static webpages)
+if(file_exists("../app/controllers/$page.php")) {
+	require "../app/controllers/$page.php";
+	// controller::render();
+	// extract(controller::$data);
+
+	// $_DEBUG[] = controller::$data; 
 }
 else{
-	new alerts("<p>The page \"" .$_GET['page'] . "\" doesn't have a config file! Loading the default config. </p>", "alert-danger");
-	require_once("../app/config/default_config.php");	//Require this pages config class 
+	$_DEBUG[] = "There is no controller for $page";
 }
-
-//Require the model files if they exist (This is where to perform ajax calls)
-
-
+/************************************CONTROLLER************************************/
 
 //Don't render HTML for this page 
 if(!config::$render){
