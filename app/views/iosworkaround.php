@@ -1,5 +1,4 @@
 <?php 
-
 /*
  
 Here are a few more clarifications in case you need them:
@@ -23,27 +22,26 @@ The task should always start with 0 back no face block but the rest of them shou
 Please do let me know if you have any questions or need any more information.
 
 */
-$efnback = new efnback(); 
-$efnback->generateSequence(); 
-$_DEBUG[] = $efnback->toString(); 
+
+/**
+ *	The current UID will be combined with a date to make it more unique but memorable. 
+ *	
+ *
+ */
+function generateUID(){
+	return rand(0,99999);
+}
 
 
+$uid = generateUID(); 
 ?>
 
 <div id="efn_contaier" class="row text-center center-block"> 
 
 	<div class="col-xs-12">
 
-		<?php //foreach($efnback->blocks as $block) echo $block->render_html(); ?>
-		
-		<input type='text' id='foo'><div onclick='$("#foo").focus();'><small>iOS Click Above to open keyboard</small></div>
 		<span id="char-pressed">Keyboard listening...</span> <br />
-		<span id="subject-id">Subject Id: <?php echo  $efnback->subject_id ?></span> <br />
-		<span id="session-id">Session Id: <?php echo  $efnback->session_id ?></span> <br />
-
-		
-
-
+		<input type='text' id='foo'><div onclick='$("#foo").focus();'><small>iOS Click Above to open keyboard</small></div>
 
 	</div>
 

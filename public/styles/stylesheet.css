@@ -2,30 +2,35 @@
   margin-top: 20px;
   font-size: 20px;
 }
-.page-home .efn-character {
+.page-home .test .efn-character {
   padding-left: 0;
   padding-right: 0;
   margin-left: 0;
   margin-right: 0;
   vertical-align: middle;
-  margin-top: 15%;
   font-size: 18px;
   /* Small devices (tablets, 768px and up) */
   /* Medium devices (desktops, 992px and up) */
   /* Large devices (large desktops, 1200px and up) */
 }
 @media (min-width: 768px) {
-  .page-home .efn-character {
+  .page-home .test .efn-character {
     font-size: 24px;
   }
 }
 @media (min-width: 992px) {
-  .page-home .efn-character {
+  .page-home .test .efn-character {
     font-size: 26px;
   }
 }
 @media (min-width: 1200px) {
-  .page-home .efn-character {
+  .page-home .test .efn-character {
     font-size: 28px;
   }
+}
+.page-home .test .no-faces {
+  margin-top: 1%;
+}
+.page-home .test .faces {
+  margin-top: 15%;
 }
