@@ -1,8 +1,10 @@
-.page-home #efn_contaier {
+.page-home #efn_contaier,
+.page-test-generations #efn_contaier {
   margin-top: 20px;
   font-size: 20px;
 }
-.page-home .test .efn-character {
+.page-home .test .efn-character,
+.page-test-generations .test .efn-character {
   padding-left: 0;
   padding-right: 0;
   margin-left: 0;
@@ -14,23 +16,28 @@
   /* Large devices (large desktops, 1200px and up) */
 }
 @media (min-width: 768px) {
-  .page-home .test .efn-character {
+  .page-home .test .efn-character,
+  .page-test-generations .test .efn-character {
     font-size: 24px;
   }
 }
 @media (min-width: 992px) {
-  .page-home .test .efn-character {
+  .page-home .test .efn-character,
+  .page-test-generations .test .efn-character {
     font-size: 26px;
   }
 }
 @media (min-width: 1200px) {
-  .page-home .test .efn-character {
+  .page-home .test .efn-character,
+  .page-test-generations .test .efn-character {
     font-size: 28px;
   }
 }
-.page-home .test .no-faces {
+.page-home .test .no-faces,
+.page-test-generations .test .no-faces {
   margin-top: 1%;
 }
-.page-home .test .faces {
+.page-home .test .faces,
+.page-test-generations .test .faces {
   margin-top: 15%;
 }
