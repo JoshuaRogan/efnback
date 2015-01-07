@@ -8,23 +8,22 @@ class block {
 	const NUMTESTS = 12; //Total number of characters per block 
 	const NUMTARGETS = 5; //Total number of targets
 	
+	//List all of the face images CHANGE THE NAMING SCHEME
+	private static $fearFaceImages = array("07fe_o_bw"); //List of all of the fear names names 
+	private static $happyFaceImages = array("07ha_o_bw"); //List of all of the happy images names 
+	private static $neutralFaceImages = array("07ne_o_bw"); //List of all of the neutral names 
 
-	public $face; //Fear, Happy, Neutral, None
-	public $type; //0-back or 2 back 
+	public $face_type; //Fear, Happy, Neutral, None
+	public $block_type; //0-back or 2 back 
 	public $block_num;	//Block number
 
-	public $tests = array(); //Each block contains 12 tests 
+	public $tests = array(); //12 Test objects 
 
-	public $two_back_sequence_order = array(); //Determine the positions of the targets in the two back sequences 
-	public $two_back_sequence_chars = array(); //The target characters
+	//Hold the sequence of letters used for the test 
+	private $targets = array(); //Associative array [target_index]=>Letter
+	private $twoback_sandwiches = array(); //Associative array [sandwhich_index]=>letter
 
-	//List all of the face images CHANGE THE NAMING SCHEME
-	public static $fearFaceImages = array("07fe_o_bw"); //List of all of the fear names names 
-	public static $happyFaceImages = array("07ha_o_bw"); //List of all of the happy images names 
-	public static $neutralFaceImages = array("07ne_o_bw"); //List of all of the neutral names 
-
-	public $num_responses; //Total number of responses generated for this block so far 
-
+	private $num_responses; //Total number of responses generated for this block so far 
 
 
 	function __construct($face, $type, $block_num){ 
@@ -33,19 +32,18 @@ class block {
 		$this->block_num = $block_num; 
 		$this->num_responses = 0; 
 
+		if($this->type == efnback::$block_type[0]){
+			$this->generate_zeroback_letter_sequence();
+		}
+
+		//Generate the 2back specfic targets 
 		if($this->type == efnback::$block_type[1]){
-			$this->generate_2back_seq_order();
-			$this->generate_2back_seq_chars();
+			$this->generate_twoback_letter_sequence(); 
 		} 
 
 		
-		//Generate all of the tests for this block 
-		for($i=0; $i < self::NUMTESTS; $i++){
-			$this->tests[] = new test($this, $i); 
-		}
 
 		//Shuffle the order of the tests for 0 back
-
 		if($this->type == efnback::$block_type[0]) shuffle($this->tests);
 
 		
@@ -61,52 +59,79 @@ class block {
 	}
 
 	/**
-	 *	Determine 5, non repeated, random positions to hold the targets 
-	 *	Must be in a position after 2 
+	 *	Generate the sequcne order and the targeres
+	 *
 	 */
-	private function generate_2back_seq_order(){
-		for($i=0; $i<block::NUMTARGETS; $i++){
-			$rand = -1; 
-			while ($rand == -1 || in_array($rand, $this->two_back_sequence_order)){
-				$rand = rand(2,block::NUMTESTS-1);
+	public function generate_twoback_letter_sequence(){
+		//Draw five random numbers between 2-11 
+		$rands = array(); 
+		for($i=0; $i < block::NUMTARGETS; $i++){
+			$rand = rand(2,11); 
+			while(in_array($rand, $rands)){	//Consider adding another clause to make it numbers + 2 appear less often 
+				$rand = rand(2,11); 
 			}
-			$this->two_back_sequence_order[$i] = $rand;
+ 			$rands[$i] = $rand;
 		}
-		//Order the sequence from least to greatest 
-		sort($this->two_back_sequence_order);
+		sort($rands); 
 
-		$this->two_back_sequence_order = array(3,4,7,8,11);
+		$targets_added = 0;
+		$sands_added = 0;
+		// Generate the entire sequence 
+		for($i=0; $i<block::NUMTESTS; $i++){
+			//This is a target
+			if(in_array($i, $rands)){
+				@$this->targets[$i] = $this->twoback_sandwiches[$i-2]; //Set it to the sandwich letter 
+				@$this->tests[$i] = new test($this->twoback_sandwiches[$i-2], true, false);
+				$targets_added++;
 
+				//Target and a sandwich 
+				if(in_array($i+2, $rands)){
+					@$this->twoback_sandwiches[$i] = @$this->targets[$i]; //Use the same letter 
+					@$this->tests[$i]->is_sandwich = true; //Modify the test object 
+					$sands_added++;
+				}
+			}
+			//This is a sandwich 
+			elseif(in_array($i+2, $rands)){
+				@$this->twoback_sandwiches[$i] = $this->generate_valid_uppercase_letter(); 
+				@$this->tests[$i] = new test($this->twoback_sandwiches[$i], false, true);
+				$sands_added++;
+			}
+			else{
+				$this->tests[$i] = new test($this->generate_valid_uppercase_letter(), false, false);
+			}
+		}
 	}
 
 	/**
-	 *	Determine 5 valid characters to put in the array
+	 *	Generate 5 targets that are M's and no M's in any other position 
 	 *
 	 */
-	private function generate_2back_seq_chars(){
+	public function generate_zeroback_letter_sequence(){ 
 		for($i=0; $i<block::NUMTARGETS; $i++){
-			$this->two_back_sequence_chars[$this->two_back_sequence_order[$i]] = $this->generate_valid_uppercase_letter($i);
+			$this->targets[$i] = "M";
+			$this->tests[$i] = new test("M", true, false); 
 		}
-		$this->two_back_sequence_chars = array(3 => "A", 4 => "F", 7=>"B", 8=>"C", 11=>"D");
+
+		for($i=block::NUMTARGETS; $i<block::NUMTESTS; $i++){
+			//Generate a capital random character that isn't M
+			while(($potential_char = chr(rand(65,90))) == "M")
+			$this->targets[$i] = "$potential_char";
+			$this->tests[$i] = new test("$potential_char", false, false); 
+		}
 	}
+
 
 	/**
 	 *	Generate a valid uppercase letter for the target letters in this 2-back block
 	 *
 	 */
-	private function generate_valid_uppercase_letter($index){
+	private function generate_valid_uppercase_letter($avoid = "0"){
 		$potential_char = chr(rand(65,90));
-		if($index < 2){
-			//Don't have to do anything special 
-		} 
-		else{
-			//If there is a target two back the characters must be the same 
-			if(in_array($this->two_back_sequence_order[$index-2], $this->two_back_sequence_order)){
-				
-			}
+
+		while(in_array($potential_char, $this->twoback_sandwiches)){
+			$potential_char = chr(rand(65,90));
 		}
-
-
 
 		return $potential_char;
 	}
@@ -128,190 +153,23 @@ class block {
  *
  */
 class test {
-	
+	const IMAGEWIDTH = 300;	//Size of the image 
+	public $letter; //The letter of this test 
 
-	public $IMAGEWIDTH = 300;
-	public $test_num; 
-	public $letter; //Determine what letter 
-	public $block;	//Block object associated with the test 
-	// public $num_responses; //Initially zero ends up at five when there are 5 valid targets 
-	public $respond; //True if this is the letter you are supposed to respond to 
-	public $sandwich; 
+	public $is_target; 
+	public $is_sandwich; 
 
-	
-	
-
-	function __construct($block, $test_num){ 
-		$this->block = $block;
-		$this->test_num = $test_num; 
-		$this->letter = $this->generate_letter();
-		
+	function __construct($letter, $is_target, $is_sandwich){  
+		$this->letter = $letter;
+		$this->is_target = $is_target;	
+		$this->is_sandwich = $is_sandwich;	//Can be become a sandwich after initialization too  
 	}
-	/**
-	 *	This will determine what type of face to render 
-	 *
-	 */
-	public function render_html(){
-
-	}
-
-	/**
-	 *	Generate a letter with the two faces for 0 back blocks
-	 *
-	 */
-	private function zero_back_face_html(){
-		return <<<HTML
-
-		<div class="row center-block test" id="test-{$this->test_num}"> 
-			<div class="col-xs-4"><img src="/img/test.bmp" alt="test" class="img-responsive center-block efn-face" width="{$this->IMAGEWIDTH}"></div>
-			<div class="col-xs-4 efn-character faces" id="efn-character-{$this->test_num}">{$this->letter}</div>
-			<div class="col-xs-4"><img src="/img/test.bmp" alt="test" class="img-responsive center-block efn-face" width="{$this->IMAGEWIDTH}"></div>
-		</div>
-HTML;
-	}
-
-	/**
-	 *	Generate a letter for 0 back blocks
-	 *
-	 */
-	private function zero_back_letter_html(){
-		return <<<HTML
-		<div class="row center-block test" id="test-{$this->test_num}"> 
-			<div class="col-xs-12 efn-character no-faces" id="efn-character-{$this->test_num}">{$this->letter}</div>
-		</div>
-HTML;
-	}	
-
-	/**
-	 *	Generate the plus sign waiting block 
-	 *
-	 */
-	private function zero_back_plus_html(){
-
-	}
-
-	/**
-	 *	Generate a letter with the two faces for 2 back blocks 
-	 *
-	 */
-	private function two_back_face_html(){
-		return <<<HTML
-
-		<div class="row center-block test" id="test-{$this->test_num}"> 
-			<div class="col-xs-4"><img src="/img/test.bmp" alt="test" class="img-responsive center-block efn-face" width="{$this->IMAGEWIDTH}"></div>
-			<div class="col-xs-4 efn-character faces" id="efn-character-{$this->test_num}">{$this->letter}</div>
-			<div class="col-xs-4"><img src="/img/test.bmp" alt="test" class="img-responsive center-block efn-face" width="{$this->IMAGEWIDTH}"></div>
-		</div>
-HTML;
-	}
-
-	/**
-	 *	Generate a letter for 2 back blocks 
-	 *
-	 */
-	private function two_back_letter_html(){
-		return <<<HTML
-		<div class="row center-block test" id="test-{$this->test_num}"> 
-			<div class="col-xs-12 efn-character no-faces" id="efn-character-{$this->test_num}">{$this->letter}</div>
-		</div>
-HTML;
-	}
-
-	/**
-	 *	Generate the plus sign waiting block 
-	 *
-	 */
-	private function two_back_plus_html(){
-
-	}
-
-
-	/**
-	 *	Generate a letter based on the type of block
-	 *
-	 */
-	private function generate_letter(){	
-		$cur_block = $this->block;
-		$targets_past = $cur_block->num_responses; 
-
-
-		$ret = "";
-		if($this->block->type == efnback::$block_type[0]){	//0-Back letter
-			if ($this->test_num < block::NUMTARGETS) {
-				$this->respond = true; 
-				$this->block->num_responses++;
-				$ret =  "M"; 
-			}
-			else return $this->generate_random_uppercase_letter();
-		}
-		else{//Use the sequence generated in the block object to determine the letter order 
-			
-			//If this test is the target use that character 
-			// $GLOBALS["_DEBUG"]["Current Num Responses-$this->test_num"] = $targets_past;
-			// $GLOBALS["_DEBUG"]["TWO BACK SEQ[NUM_RES]-$this->test_num"] = $this->block->two_back_sequence_order[$targets_past];
-
-			//Target Letter 
-			if($cur_block->two_back_sequence_order[$targets_past] == $this->test_num){
-				$this->respond = true;
-
-				$ret = $cur_block->two_back_sequence_chars[$this->test_num];
-
-				$cur_block->num_responses++;
-			}
-			//Two before the target letter
-			elseif(($cur_block->two_back_sequence_order[$targets_past] - 2) == $this->test_num ){
-				// $ret = $cur_block->two_back_sequence_chars[$cur_block->two_back_sequence_order[$targets_past]];
-				$ret = $cur_block->two_back_sequence_chars[$this->test_num + 2]; //Indexed by the location
-				$this->sandwich = true; 
-			}
-			//Sandwich letter that is on the next target 
-			elseif($targets_past+1 < block::NUMTARGETS &&  (($cur_block->two_back_sequence_order[$targets_past+1] - 2) == $this->test_num) ){
-				// $ret = $cur_block->two_back_sequence_chars[$cur_block->two_back_sequence_order[$targets_past+1]];
-
-				$ret = "*";
-				$ret = $cur_block->two_back_sequence_chars[$this->test_num + 2]; //Indexed by the location of the target
-
-				$this->sandwich = true; 
-			}
-			// else return 
-			else {
-				
-				$ret = $this->generate_random_uppercase_letter();
-			}
-		}
-		return $ret; 
-		
-	}
-
-	/**
-	 *	Generate a letter based on the type of block besides M
-	 *
-	 */
-	public function generate_random_uppercase_letter(){
-		$potential_char = chr(rand(65,90));
-		if($this->block->type == efnback::$block_type[0]){//0-back
-			//Don't generate a M
-			while($potential_char == "M"){
-				$potential_char = chr(rand(65,90));
-			}
-		}
-		elseif($this->block->type == efnback::$block_type[1]){// 2-back
-			//Don't generate a character that is a target in two blocks
-			while(in_array($potential_char, $this->block->two_back_sequence_chars)){
-				$potential_char = chr(rand(65,90));
-			}
-		} 
-		return $potential_char;
-	}
-
-
-
-
 
 	public function toString(){ 
 		$string = "\n------TEST------\n"; 
-		$string .= "Test Number: $this->test_num\n"; 
 		$string .= "Letter $this->letter\n"; 
+		$string .= "Target $this->is_target\n"; 
+		$string .= "Sandwich $this->is_target\n"; 
 		$string .= "------TEST------\n"; 
 
 		return $string;
@@ -399,18 +257,11 @@ class efnback{
 	}
 
 
-
-
-
-
-
-
-
 	/**********************************STATIC METHODS**********************************/
 
 	/**
 	 *	Generate a short id that will be combined with the date in the database
-	 *	to make it more unique. 
+	 *	to make it more unique. Probably will interact with a database 
 	 */
 	private static function generate_subject_id(){
 		return rand(0,99999);
@@ -419,7 +270,7 @@ class efnback{
 
 	/**
 	 *	Generate a short id that will be combined with the date in the database
-	 *	to make it more unique. 
+	 *	to make it more unique. Probably will interact with a database
 	 */
 	private static function generate_session_id(){
 		return rand(0,99999);
