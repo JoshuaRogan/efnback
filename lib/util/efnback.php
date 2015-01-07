@@ -22,6 +22,7 @@ class block {
 	//Hold the sequence of letters used for the test 
 	private $targets = array(); //Associative array [target_index]=>Letter
 	private $twoback_sandwiches = array(); //Associative array [sandwhich_index]=>letter
+	private $junk_characters = array(); //Charcters that also shouldn't be repeated but have no significance
 
 	private $num_responses; //Total number of responses generated for this block so far 
 
@@ -129,10 +130,10 @@ class block {
 	private function generate_valid_uppercase_letter($avoid = "0"){
 		$potential_char = chr(rand(65,90));
 
-		while(in_array($potential_char, $this->twoback_sandwiches)){
+		while(in_array($potential_char, $this->twoback_sandwiches) || in_array($potential_char, $this->junk_characters)){
 			$potential_char = chr(rand(65,90));
 		}
-
+		$this->junk_characters[] = $potential_char; 
 		return $potential_char;
 	}
 
