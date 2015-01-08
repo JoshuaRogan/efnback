@@ -24,27 +24,82 @@ Please do let me know if you have any questions or need any more information.
 
 */
 $efnback = new efnback(); 
-$efnback->generateSequence(); 
-$_DEBUG[] = $efnback->toString(); 
-
 
 ?>
 
 <div id="efn_contaier" class="row text-center center-block"> 
 
-	<div class="col-xs-12">
 
-		<?php //foreach($efnback->blocks as $block) echo $block->render_html(); ?>
-		
-		<input type='text' id='foo'><div onclick='$("#foo").focus();'><small>iOS Click Above to open keyboard</small></div>
-		<span id="char-pressed">Keyboard listening...</span> <br />
+		<?php  
+			//Generate the HTML for all of the tests (hiding all of them at first )
+			// foreach($efnback->blocks as $block){
+			// 	echo "<p> Block Type: $block->type </p>";
+			// 	echo "<p> Face Type: $block->face </p>";
+			// }
+		?>
+		<div id="instructions_container" class="col-xs-12 hidden"> 
+			 <p id="instructions"> Press the button with your finger when you see the letter "M"</p>
+		</div>
+
+		<div id="blocks">
+			<?php 
+				foreach($efnback->blocks as $block):
+					if($block->face != "none") {
+						$block_class = "with-face";
+						$char_rows = "col-xs-4"; 
+						$face = true; 
+					} 
+					else {
+						$block_class = "";
+						$char_rows = "col-xs-12";
+						$face = false; 
+					}
+
+
+			?>
+
+			<!---BLOCK --> 
+			<div id="block-<?php echo $block->id?>" class="row hidden block <?php echo $block_class . " " . $block->type;?> "> 
+				
+
+				<?php if($face): ?>
+				<div class="col-xs-4 center-block text-center"> 
+					<img class="face" src="/img/test.bmp" width="300" alt="faceimage">
+				</div>
+				<?php endif; ?>
+
+
+
+				<!-- Generate the characters -->
+				<div class="<?php echo $char_rows?>"> 
+					<?php foreach($block->tests as $key => $test): ?>
+					<div id="<?php echo "block-id-$block->id-$key"; ?>" class="hidden char <?php $test->echo_target()?>"><?php echo $test->letter; ?></div>
+					<?php endforeach; ?>
+				</div>
+				<!-- Generate the characters --> 
+
+				<?php if($face): ?>
+				<div class="col-xs-4 center-block text-center"> 
+					<img class="face" src="/img/test.bmp" width="300" alt="faceimage">
+				</div>
+				<?php endif; ?>
+
+
+			</div>
+			<!---BLOCK -->
+			<?php
+				endforeach; // End block
+			?>
+		</div>
+
+<!-- 		
 		<span id="subject-id">Subject Id: <?php echo  $efnback->subject_id ?></span> <br />
 		<span id="session-id">Session Id: <?php echo  $efnback->session_id ?></span> <br />
-
+ -->
 		
 
 
 
-	</div>
+	
 
 </div>

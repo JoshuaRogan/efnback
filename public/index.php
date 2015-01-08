@@ -4,7 +4,6 @@ ini_set('display_errors', 'On');
 ini_set('error_reporting', E_ALL);
 
 
-
 //Autoloading of classes
 function __autoload($class_name) {
 	
@@ -13,6 +12,9 @@ function __autoload($class_name) {
 	}
 
 	//Check more locations here 
+	if(file_exists("../lib/framework/$class_name" . ".php")){
+		require("../lib/framework/$class_name" . ".php");
+	}
 
 	//Check other locations here
 

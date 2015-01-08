@@ -1,9 +1,9 @@
 $(document).ready(function() {
 
-	startListening(); 
-	//startTimer(); 
-	//stopListening();
-	//StopTimer(); 
+	$("#blocks").each(function(index){
+		console.log( index + ": " + ($( this ).text()).trim() );
+	});
+	
 	
 
 });

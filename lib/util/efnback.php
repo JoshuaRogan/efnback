@@ -13,9 +13,9 @@ class block {
 	private static $happyFaceImages = array("07ha_o_bw"); //List of all of the happy images names 
 	private static $neutralFaceImages = array("07ne_o_bw"); //List of all of the neutral names 
 
-	public $face_type; //Fear, Happy, Neutral, None
-	public $block_type; //0-back or 2 back 
-	public $block_num;	//Block number
+	public $face; //Fear, Happy, Neutral, None
+	public $type; //0-back or 2 back 
+	public $id;	//Block number
 
 	public $tests = array(); //12 Test objects 
 
@@ -27,10 +27,10 @@ class block {
 	private $num_responses; //Total number of responses generated for this block so far 
 
 
-	function __construct($face, $type, $block_num){ 
+	function __construct($face, $type, $id){ 
 		$this->face = $face; 
 		$this->type = $type; 
-		$this->block_num = $block_num; 
+		$this->id = $id; 
 		$this->num_responses = 0; 
 
 		if($this->type == efnback::$block_type[0]){
@@ -47,7 +47,6 @@ class block {
 		//Shuffle the order of the tests for 0 back
 		if($this->type == efnback::$block_type[0]) shuffle($this->tests);
 
-		
 
 	}
 
@@ -176,6 +175,10 @@ class test {
 		return $string;
 	}
 
+	public function echo_target(){
+		if($this->is_target) echo "target"; 
+	}
+
 }
 
 
@@ -225,22 +228,24 @@ class efnback{
 				$block_counter++;
 			}
 		}
-		
+
+		// HTML::add("variable_name", $this);
+
+		$this->generateSequence(); //No reason for the client to do this 
 	}
+
 
 	/**
 	 *	Generate the sequence of blocks that will be used for this run
 	 *
 	 */
-	public function generateSequence(){
+	private function generateSequence(){
 		$sequence = array(); 
 		$sequence[] = $this->blocks[0]; //Always start the tests with
 		unset($this->blocks[0]);
 		shuffle($this->blocks); //Shuffle the order of the blocks 
 		$this->blocks = array_merge($sequence,$this->blocks); 
-
 	}
-
 
 
 	public function toString(){ 

@@ -10,46 +10,61 @@ body{
 	#efn_contaier{
 		margin-top: 20px;
 		font-size: 20px;
-	}
+	
+		#instructions_container{
+			margin-top: 5%; 
+			#instructions{
 
-	.test{
-
-
-
-		.efn-character{
-			padding-left: 0; 
-			padding-right: 0; 
-			margin-left: 0;
-			margin-right: 0; 
-			vertical-align: middle; 
-			
-
-			font-size: 18px;
-
-			/* Small devices (tablets, 768px and up) */
-			@media (min-width: @screen-sm-min) {font-size: 24px; }
-
-			/* Medium devices (desktops, 992px and up) */
-			@media (min-width: @screen-md-min) {font-size: 26px; }
-
-			/* Large devices (large desktops, 1200px and up) */
-			@media (min-width: @screen-lg-min) {font-size: 28px; }
+			}
 		}
 
-		//
-		.no-faces{
-			margin-top: 1%;
+		.block{
+
+
+			.char{
+				padding-left: 0; 
+				padding-right: 0; 
+				margin-left: 0;
+				margin-right: 0; 
+				vertical-align: middle; 
+				padding-top: 25px;
+
+				font-size: 18px;
+
+				/* Small devices (tablets, 768px and up) */
+				@media (min-width: @screen-sm-min) {font-size: 24px; }
+
+				/* Medium devices (desktops, 992px and up) */
+				@media (min-width: @screen-md-min) {font-size: 26px; }
+
+				/* Large devices (large desktops, 1200px and up) */
+				@media (min-width: @screen-lg-min) {font-size: 28px; }
+			}
+
+
+			&.with-face{
+				.char{
+					padding-top: 25%;
+				}
+			}
+
+			//
+			.no-faces{
+				margin-top: 1%;
+			}
+
+			.faces{
+				margin-top: 15%;
+			}
 		}
 
-		.faces{
-			margin-top: 15%;
+		.face{
+			display: inline !important; 
+			max-width: 100%;
+			height: auto;
 		}
-	}
 
-	.efn-face{
-		 
 	}
-
 
 
 }
