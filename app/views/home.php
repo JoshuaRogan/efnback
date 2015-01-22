@@ -12,6 +12,8 @@ For the 0 back blocks: respond to M; there are 5 Ms and the rest of the letters 
 0 back fear face block
 0 back happy face block
 0 back neutral face block
+
+
 For the 2 back blocks: respond to the A – B –A pattern (but using different letters); there are 5 letter sandwiches and the rest of the letters are random. (this is an example of the letters with the correct targets in bold and italics: Q + C + N + N + O + A + O + A + O + R + O + R)
 2 back no face block
 2 back fear face block
@@ -24,6 +26,7 @@ Please do let me know if you have any questions or need any more information.
 
 */
 $efnback = new efnback(); 
+$_DEBUG[] = json_encode($efnback);
 
 ?>
 

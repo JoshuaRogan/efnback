@@ -8,7 +8,7 @@
  */
 
 class global_config{
-	public static $debug				= true; 
+	public static $debug				= false; 
 	public static $render 				= true;	
 
 	public static $author 				= "Josh Rogan"; 

@@ -1,10 +1,7 @@
 <?php
 
 $efnback = new efnback(); 
-$efnback->generateSequence(); 
-// $_DEBUG[] = $efnback->toString(); 
-$nigger = HTML::$html["nigger"];
-// $_DEBUG[] = $nigger->toString(); 
+
 
 
 ?>

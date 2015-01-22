@@ -1,32 +1,35 @@
 $(document).ready(function() {
+	$.getJSON( "/get_blocks", function( data ) {
+		efnback = new efnback(data);
+		console.log(data); 
+		console.log(efnback);
+		
+		 
 
-	$("#blocks").each(function(index){
-		console.log( index + ": " + ($( this ).text()).trim() );
+
+		//Bind the button to the handler 
+		$("#primary-action").click(function() {
+			if(efnback.started){
+				efnback.buttonPressed();
+			}
+			else{
+				efnback.started = true; 
+				$("#primary-action").html("Primary Action"); 
+				// $("#instructions_container").removeClass("hidden"); 
+				efnback.start(); 
+			}
+			
+		});
 	});
-	
-	
+
+
+
+
+
+
+
+
 
 });
 
-/**
- *	Listen to the keyboard for key presses.   
- *
- */
-function startListening(){
-	var charPressed = ""; 
-	$("body").keypress(function( event ) {
-		charPressed = String.fromCharCode(event.charCode)
-		// console.log(charPressed);
-		$("#char-pressed").html("You pressed " + charPressed);
-	});
 
-	return charPressed; 
-}
-
-/**
- *	Stop listening for keys 
- *
- */
-function stopListening(){
-	$("body").unbind('keypress', null);
-}

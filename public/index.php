@@ -66,7 +66,7 @@ else{
 
 /************************************CONTROLLER************************************/
 require "../app/controllers/controller.php";	//The generic controller 
-// Require the model they exist (doesn't have to for mostly static webpages)
+// Require the controller they exist (doesn't have to for mostly static webpages)
 if(file_exists("../app/controllers/$page.php")) {
 	require "../app/controllers/$page.php";
 	// controller::render();
@@ -79,9 +79,15 @@ else{
 }
 /************************************CONTROLLER************************************/
 
-//Don't render HTML for this page 
+//Don't render HTML for this page look for ajax
 if(!config::$render){
-
+	//Check for ajax page
+	if(file_exists("../app/ajax/$page.php")) {
+		require "../app/ajax/$page.php"; 
+	}
+	else{
+		$_DEBUG[] = "There is no ajax for $page";
+	}
 
 }
 
