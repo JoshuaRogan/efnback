@@ -27,9 +27,9 @@
 
 	<!-- THIS SECTION GENERATED VIA JS --> 
 
-	<div id="button"> 
+	<!-- <div id="button"> 
 		<button id="primary-action" type="button" class="btn btn-primary">Start</button>
-	</div>
+	</div> -->
 	
 
 </div>
