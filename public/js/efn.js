@@ -10,46 +10,48 @@
  	efnback.Blocktypes = ["0back", "2back"]
 
  	this.json = json;
+
  	this.started = false; //Has the task been started 
  	this.finished = false; //Has the task been finished 
 
  	this.blocks = Array(); //An array of blocks which contain the tests 
-
  	this.block_pointer = 0; 
 
  	//Build all of the blocks here 
  	for (var i = 0; i < json.blocks.length; i++) {
- 		this.blocks[i] = new block(i,json.blocks[i].type, json.blocks[i]);
+ 		this.blocks[i] = new block(i, json.blocks[i]);
  	}
 
+
  	/**
- 	 *	Start the block
+ 	 *	Run until all of the blocks are finished.
+ 	 * 		-Don't use while (blocking)
  	 *
  	 */
  	 this.start = function(){
  	 	console.log("Start EFN");
 
-
 		var self = this; 
 		var myInterval = setInterval(function () {
-
-
-
- 	 		if(!self.blocks[self.block_pointer].started){//If the current block isn't started start it 
+ 	 		//If the current block isn't started start it 
+ 	 		if(!self.blocks[self.block_pointer].started){
  	 			self.blocks[self.block_pointer].start(); 
  	 		}
- 	 		else if(self.blocks[self.block_pointer].finished && self.block_pointer < 7){//If the current block is finished move to the next and start it 
+ 	 		//If the current block is finished move to the next and start it
+ 	 		else if(self.blocks[self.block_pointer].finished && self.block_pointer < 7){ 
  	 			self.block_pointer++;
 				self.blocks[self.block_pointer].start();
  	 		}
- 	 		
- 	 		if(self.blocks[self.block_pointer].finished && self.block_pointer == 7){
- 	 			clearInterval(myInterval);
+ 	 			
+ 	 		//If the last block is finished 
+ 	 		if(self.block_pointer == 7 && self.blocks[self.block_pointer].finished){
+ 	 			clearInterval(myInterval);//Stop the interval from repeating
  	 			self.finished = true; //Mark this block as finished  
- 	 			console.log("Task Finished");
- 	 			$(".char").html("Task Finished"); //Update the DOM with the actual letter
+
+ 	 			console.log("Entire Task Finished");
  	 			console.log(self); 
 
+ 	 			//Compute Stats 
  	 			var accuracy = self.getPercentCorrect();
  	 			var avgerageTime = self.getAverageTime();
  	 			$("#efn_contaier").html("Accuracy = " + accuracy +" <br/> Average Time = " + avgerageTime);
@@ -120,36 +122,49 @@
  	 	}
 
  	 	console.log(correct, total); 
- 	 	var percent = (correct / total) * 100
+ 	 	var percent = (correct / total) * 100; // Could just return this 
  	 	return percent + "% (" + correct + "/" + total +")";
  	}
 
+ 	/**
+ 	 *	Send the reuslts to the serever 
+ 	 *
+ 	 */
+ 	 this.sendResults = function(){
+
+ 	 }
 
 
  }
 
 
 /*
- *	One block that contains 12 tests where the correct letter 
- *	
+ *	One block of tests that contains 12 tests objects with 5 targets 
+ *		-Two Types 0back or 2back
  *	
  * 
  *
  */
-function block(id, type, json_block){
+function block(id, json_block){
 	block.numTests = efnback.numTests;
-	this.id = id; 
-	this.type = type; 
-	this.sequence = Array(); 
-	this.tests = Array(); 
-	this.finished = false; 
-	this.started = false; 
 
+	this.id = id; 
+	this.type = json_block.type; 
+	this.faceType = json_block.face;
+
+	this.sequence = Array(); //REMOVE IF POSSIBLE 
+	
+	this.tests = Array(); 
 	this.testPointer = 0; //Pointer to the correct test 
 
-	//Using the JSON Build the tests 
+	//Status of this block 
+	this.started = false; 
+	this.finished = false; 
+
+
+	//Using the JSON build all of the test objects
 	for(var i = 0; i < json_block.tests.length; i++){
-		this.tests[i] = new test(i, json_block.tests[i].letter, json_block.tests[i].is_target) 
+		this.tests[i] = new test(i, json_block.tests[i].letter, json_block.tests[i].is_target, this.type, this.faceType);
 	}
 
 
@@ -181,16 +196,7 @@ function block(id, type, json_block){
 
  	 		if(self.testPointer == 12){
  	 			clearInterval(myInterval);
- 	 			console.log("Block Finished");
- 	 			$(".char").html("Block " + (self.id + 1) + " finished"); //Update the DOM with the actual letter
- 	 			
- 	 			setTimeout(function(){
-
-					self.finished = true; //Mark this block as finished 
-
-				},5000);
-
-
+ 	 			self.finished = true; //Mark this block as finished 
  	 			console.log(self.tests); 
  	 		} 
 
@@ -220,21 +226,105 @@ function block(id, type, json_block){
  * 	
  *
  */
-function test(id, letter, isTarget){ 
-	test.letterShowTimeMS = 500; //Time that each letter appears on the screen
-	test.plusSignTimeMS = 3500; //Time that the + sign appears on the screen
-	this.id = id; //A unique identifier for this test 
+function test(id, letter, isTarget, blockType, faceType){ 
+	this.letterShowTimeMS = 500; //Time that each letter appears on the screen
+	this.plusSignTimeMS = 3500; //Time that the + sign appears on the screen
+	this.directionsTimeMS = 3500; //Show the directions for 3.5s
+
+	this.id = id; //A unique identifier for this test (order of the items)
+
 	this.letter = letter; //The letter for this test 
 	this.isTarget = isTarget; //True or false value representing if this letter is the target 
 
-	this.state = 0; //What is the current state of this task (not active = 0, plus_sign = 1, letter_showing = 2, wrong = 3, correct = 4, completed = 5)
+	//Current state of this test  
+	this.state = 0; //(not active = 0,  letter_showing = 1, plus_sign = 2, wrong = 3, correct = 4, completed = 5)
 
 	this.correct = null; //If this test was correct 
 	this.pushed = false; //If the user actually pressed the button in time
 
-	this.timeMS = 0; //The total time to complete the test
-	this.startTimeMS = 0; //Used to calculate the time to complete
-	this.stopTimeMS = 0; //Used to calculate the time to complete 
+	this.timeMS = -1; //The total time to complete the test
+	this.startTimeMS = -1; //Used to calculate the time to complete
+	this.stopTimeMS = -1; //Used to calculate the time to complete 
+
+	//Used to determine the instructions and generate the correct face image 
+	this.blockType = blockType;
+	this.faceType = faceType;
+
+
+	/**
+	 *	Control the timing of the states
+	 *
+	 */
+	this.start = function (){
+		var self = this; 
+
+		
+		if(this.id == 0){//First test show the instructions 
+			//Show the directions based on the type 
+			self.changeState(6); //Move to the show instructions state 
+
+			$(".char").html(self.getInstructions()); //Update the DOM with the instructions  
+			self.switchToNoFace(); 
+
+
+
+			setTimeout(function(){	
+				//Show the letter for 500ms
+				self.changeState(1); //Move to the show letter state
+				setTimeout(function(){
+					self.changeState(2); //Move to the showing plus sign state
+					//Show the plus sign for 3500ms
+					setTimeout(function(){
+						//The test is over 
+						if(self.state != 3){ //If it isn't already wrong (No Press)
+							if(self.isTarget){ //If this was the target is should have been pressed
+								self.correct = false; 
+								self.pushed = false; 
+							}
+							else{//This was a control so it is correct 
+								self.correct = true; 
+								self.pushed = false;
+							}
+						}
+						self.stop(); //Finish the test
+					},self.plusSignTimeMS);
+
+				}, self.letterShowTimeMS);
+
+			}, self.directionsTimeMS);
+
+		}
+		else{//All other tests 
+
+			//Show the letter for 500ms
+			self.changeState(1); //Move to the show letter state
+			setTimeout(function(){
+				self.changeState(2); //Move to the showing plus sign state
+				//Show the plus sign for 3500ms
+				setTimeout(function(){
+					//The test is over 
+					if(self.state != 3){ //If it isn't already wrong (No Press)
+						if(self.isTarget){ //If this was the target is should have been pressed
+							self.correct = false; 
+							self.pushed = false; 
+						}
+						else{//This was a control so it is correct 
+							self.correct = true; 
+							self.pushed = false;
+						}
+					}
+
+					self.stop(); //Finish the test
+				},self.plusSignTimeMS);
+
+			}, self.letterShowTimeMS);
+
+		}
+
+	}
+
+
+
 
 	/**
  	 *	Button press cascasded down from block
@@ -242,92 +332,96 @@ function test(id, letter, isTarget){
  	 */
  	this.buttonPressed = function(){
  		if(this.state == 0){ //Not active
- 			//Do nothing
- 			console.log("State == 0 NOT ACTIVE");
+ 			console.log("State == 0 NOT ACTIVE");	//Don't do anything 
  		}
- 		else if(this.state == 1){//Showing plus sign
- 			console.log("State == 1 AT PLUS SIGN");
- 			this.pushed = true; 
- 			this.state = 3; //Wrong state
- 			this.correct = false; 
- 		}
- 		else if(this.state == 2){//The Letter is showing
- 			this.pushed = true;
+ 		else if(this.state == 1){//Showing the letter
+ 			this.pushed = true;	//This was pushed 
  			if(this.isTarget){
- 				console.log("State == 2 AT CHAR and isTarget");
- 				this.stopTime(); //Stop the timer 
+ 				console.log("State == 1 AT CHAR and isTarget");
+ 				this.stopTime(); //Stop the timer and set the results 
  				this.state = 4; //Correct 
  				this.correct = true; 
  			}
  			else{
- 				console.log("State == 2 AT CHAR but is control");
+ 				console.log("State == 1 AT CHAR but is control");
  				this.state = 3; //Wrong
  				this.correct = false; 
- 			}		
+ 			}
  		}
- 		else if(this.state == 3){//Wrong
+ 		else if(this.state == 2){//Showing the plus sign 
+ 			console.log("State == 2 AT PLUS SIGN");
+ 			//If this is a target 
+ 			if(this.isTarget){
+ 				this.stopTime(); //Stop the timer 
+ 			}
+
+
+ 			this.pushed = true; 
+ 			this.state = 3; //Move to incorrect state  
+ 			this.correct = false; 	
+
+ 			
+ 		}
+ 		else if(this.state == 3){//Wrong State
  			//Do nothing
  		} 		
- 		else if(this.state == 4){//Correctly pressed (Shouldn't ever get here)
+ 		else if(this.state == 4){//Already correctly pressed 
  			//Do nothing
  		}
  	}
 
-	/**
-	 *	Start the actual test 
+ 	/**
+	 *	
 	 *
 	 */
-	this.start = function (){
-		this.state = 1; //Show the plus sign
-		$(".char").html("+"); //Update the DOM
+	this.changeState = function(stateNumber){
+		if(stateNumber == 0){	//Not active 
+			this.state = 0; 
+		}
+		else if(stateNumber == 1){	//Letter Showing
+			this.state = 1; 
+			console.log(this.faceType);
 
-		//Change it to the letter after 3500ms
-		var self = this; 
-		setTimeout(function(){
-			$(".char").html(self.letter); //Update the DOM with the actual letter
-			self.state = 2; //Letter is showing 
-			self.startTime(); //start the timer
+			if(this.faceType == "none") {
+				this.switchToNoFace();
+			}
+			else {
+				this.switchToFace();
+			}
 
-			//-------------Button presses should happen here-----------//
+			this.updateImage();
 
-
-			//Show the letter for 500ms and then end the task
-			setTimeout(function(){
-				if(self.state == 2){ //If the user didn't press anything 
-					if(self.isTarget){ //This test should have been pressed and at state 4
-						self.correct = false; 
-						self.pushed = false; 
-					}
-					else{//This was a control so it is correct 
-						self.correct = true; 
-						self.pushed = false;
-					}
-				}
-				else{
-
-				}
-			
-				self.stop();//Move to completed state
-			},test.letterShowTimeMS);
-
-
-		},test.plusSignTimeMS);
+			$(".char").html(this.letter); //Update the DOM with the actual letter
+			this.startTime(); //Start the timer (After it actually shows in the DOM)
+		}
+		else if(stateNumber == 2){	//Plus sign showing
+			this.state = 2; 
+			$(".char").html('+'); //Update the DOM with the actual letter
+		}
+		else if(stateNumber == 3){	//Incorrect 
+			this.state = 3;
+		}
+		else if(stateNumber == 4){	//Correct 
+			this.state = 4;
+		}
+		else if(stateNumber == 5){	//Finished 
+			this.state = 5;
+		}		
+		else if(stateNumber == 6){	//Show instructions  
+			this.state = 6;
+		}
 	}
+
+
+
 	/**
 	 *	Abnormal stop on user press 
 	 *		
 	 */
 	this.stop = function(){
-		this.state = 5; //Move to completed state 
+		this.changeState(5);
 	}
 
-	/**
-	 *	Based on the type look at the EFN array to 
-	 *
-	 */
-	this.getImage = function (){
-		return "/img/test.jpg"; 
-	}
 
 	//Start the timer
 	this.startTime = function(){
@@ -336,15 +430,52 @@ function test(id, letter, isTarget){
 
 	//Stop the timer and set the different to timeMS
 	this.stopTime = function(){	
-		this.stopTimeMS = Date.now(); 
-		this.timeMS = this.stopTimeMS - this.startTimeMS; 
+		//Only compute the time on the first press 
+		if(this.timeMS == -1){
+			this.stopTimeMS = Date.now(); 
+			this.timeMS = this.stopTimeMS - this.startTimeMS; 
+		}
+		
+	}
+
+	//Return the proper instructions (this.blockType)
+	this.getInstructions = function(){
+		if(this.blockType == "0-back"){
+			return "Touch or click anywhere on the screen when you see the letter 'M'"; 
+		}
+		else if(this.blockType == "2-back"){
+			return "Touch or click anywhere on the screen when you see a 2-back letter series <br/> (That's the 'A - B - A' - type series)";
+		}
+		
+	}
+
+	//Based on the type update the images on the page with the new face 
+	this.updateImage = function (){
+		if(this.faceType == "none") return
+
+		var imgsrc = "";
+		var img_index = Math.floor(Math.random() * (16 - 1)) + 1; //Random index between 0-16
+		if(this.faceType == "neutral") imgsrc = "img/faces/neautral/neautral-" + img_index + ".jpg";
+		else if(this.faceType == "fear") imgsrc = "img/faces/fear/fear-" + img_index + ".jpg";
+		else if(this.faceType == "happy") imgsrc ="img/faces/happy/happy-" + img_index + ".jpg";
+
+		console.log(imgsrc);
+
+		$(".face").attr("src", imgsrc);
+	}
+
+	//Switch to the no face hidden
+	this.switchToNoFace = function(){
+		$("#block-no-face").removeClass("hidden");
+		$("#block-face").addClass("hidden");
+	}
+
+	this.switchToFace = function(){
+		$("#block-no-face").addClass("hidden");
+		$("#block-face").removeClass("hidden");
 	}
 
 	/****PRIVATE METHODS****/
 
-	//Wait for ms millseconds 
-	test.prototype.wait = function(ms){
-		setTimeout(function(){},ms);
-	}
 
 }

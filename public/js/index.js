@@ -8,7 +8,7 @@ $(document).ready(function() {
 
 
 		//Bind the button to the handler 
-		$('body').on('vmousedown tap ',function(event) {
+		$('html').on('vmousedown tap ',function(event) {
 			event.preventDefault();
 			if(efnback.started){
 				efnback.buttonPressed();

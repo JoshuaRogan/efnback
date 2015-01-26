@@ -1,20 +1,24 @@
 body {
   font-family: "Courier New", Courier, monospace;
+  min-height: 100%;
 }
 .page-home #efn_contaier,
 .page-test-generations #efn_contaier,
-.page-home-js #efn_contaier {
+.page-home-js #efn_contaier,
+.page-beta #efn_contaier {
   margin-top: 20px;
   font-size: 20px;
 }
 .page-home #efn_contaier #instructions_container,
 .page-test-generations #efn_contaier #instructions_container,
-.page-home-js #efn_contaier #instructions_container {
+.page-home-js #efn_contaier #instructions_container,
+.page-beta #efn_contaier #instructions_container {
   margin-top: 2%;
 }
 .page-home #efn_contaier .char,
 .page-test-generations #efn_contaier .char,
-.page-home-js #efn_contaier .char {
+.page-home-js #efn_contaier .char,
+.page-beta #efn_contaier .char {
   padding-left: 0;
   padding-right: 0;
   margin-left: 0;
@@ -28,37 +32,43 @@ body {
 @media (min-width: 768px) {
   .page-home #efn_contaier .char,
   .page-test-generations #efn_contaier .char,
-  .page-home-js #efn_contaier .char {
+  .page-home-js #efn_contaier .char,
+  .page-beta #efn_contaier .char {
     font-size: 26px;
   }
 }
 @media (min-width: 992px) {
   .page-home #efn_contaier .char,
   .page-test-generations #efn_contaier .char,
-  .page-home-js #efn_contaier .char {
+  .page-home-js #efn_contaier .char,
+  .page-beta #efn_contaier .char {
     font-size: 28px;
   }
 }
 @media (min-width: 1200px) {
   .page-home #efn_contaier .char,
   .page-test-generations #efn_contaier .char,
-  .page-home-js #efn_contaier .char {
+  .page-home-js #efn_contaier .char,
+  .page-beta #efn_contaier .char {
     font-size: 30px;
   }
 }
 .page-home #efn_contaier #block-no-face .char,
 .page-test-generations #efn_contaier #block-no-face .char,
-.page-home-js #efn_contaier #block-no-face .char {
+.page-home-js #efn_contaier #block-no-face .char,
+.page-beta #efn_contaier #block-no-face .char {
   padding-top: 25px;
 }
 .page-home #efn_contaier #block-face .char,
 .page-test-generations #efn_contaier #block-face .char,
-.page-home-js #efn_contaier #block-face .char {
+.page-home-js #efn_contaier #block-face .char,
+.page-beta #efn_contaier #block-face .char {
   padding-top: 10%;
 }
 .page-home #efn_contaier #block-face .face,
 .page-test-generations #efn_contaier #block-face .face,
-.page-home-js #efn_contaier #block-face .face {
+.page-home-js #efn_contaier #block-face .face,
+.page-beta #efn_contaier #block-face .face {
   display: inline !important;
   max-width: 100%;
   height: auto;
