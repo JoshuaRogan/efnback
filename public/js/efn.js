@@ -3,7 +3,11 @@
  *	
  *	
  */
+ 
+
  function efnback(json){
+ 	var efnback = efnback || {};
+
  	efnback.numTests = 12; 
  	efnback.numBlocks = 8; 
  	efnback.numTargets = 5; 
@@ -17,8 +21,8 @@
  	this.blocks = Array(); //An array of blocks which contain the tests 
  	this.block_pointer = 0; 
 
- 	//Build all of the blocks here 
- 	for (var i = 0; i < json.blocks.length; i++) {
+ 	//Build all of the blocks here json.blocks.length
+ 	for (var i = 0; i < efnback.numBlocks; i++) {
  		this.blocks[i] = new block(i, json.blocks[i]);
  	}
 
@@ -38,13 +42,13 @@
  	 			self.blocks[self.block_pointer].start(); 
  	 		}
  	 		//If the current block is finished move to the next and start it
- 	 		else if(self.blocks[self.block_pointer].finished && self.block_pointer < 7){ 
+ 	 		else if(self.blocks[self.block_pointer].finished && self.block_pointer < (efnback.numBlocks - 1)){ 
  	 			self.block_pointer++;
 				self.blocks[self.block_pointer].start();
  	 		}
  	 			
- 	 		//If the last block is finished 
- 	 		if(self.block_pointer == 7 && self.blocks[self.block_pointer].finished){
+ 	 		//If the last block is finished 7
+ 	 		if(self.block_pointer == (efnback.numBlocks - 1) && self.blocks[self.block_pointer].finished){
  	 			clearInterval(myInterval);//Stop the interval from repeating
  	 			self.finished = true; //Mark this block as finished  
 
@@ -173,15 +177,6 @@ function block(id, json_block){
  	 *
  	 */
  	 this.start = function() {
- 	 	//Show the instructions 
-		// setTimeout(function(){
-
-		// 	self.finished = true; //Mark this block as finished 
-
-		// },5000);
-
-
-
  	 	console.log("Block Starting"); 
  	 	this.started = true; 
  	 	var self = this; 
@@ -263,21 +258,24 @@ function test(id, letter, isTarget, blockType, faceType){
 			//Show the directions based on the type 
 			self.changeState(6); //Move to the show instructions state 
 
-			$(".char").html(self.getInstructions()); //Update the DOM with the instructions  
+			$("#instructions").removeClass("hidden");
+			$("#instructions").html(self.getInstructions()); //Update the DOM with the instructions  
 			self.switchToNoFace(); 
 
 
 
 			setTimeout(function(){	
+
+				$("#instructions").addClass("hidden");
 				//Show the letter for 500ms
 				self.changeState(1); //Move to the show letter state
 				setTimeout(function(){
 					self.changeState(2); //Move to the showing plus sign state
 					//Show the plus sign for 3500ms
 					setTimeout(function(){
-						//The test is over 
-						if(self.state != 3){ //If it isn't already wrong (No Press)
-							if(self.isTarget){ //If this was the target is should have been pressed
+						//Time limit has expired 
+						if(self.state == 2){ 
+							if(self.isTarget){ //If this was the target it should have been pressed
 								self.correct = false; 
 								self.pushed = false; 
 							}
@@ -303,7 +301,7 @@ function test(id, letter, isTarget, blockType, faceType){
 				//Show the plus sign for 3500ms
 				setTimeout(function(){
 					//The test is over 
-					if(self.state != 3){ //If it isn't already wrong (No Press)
+					if(self.state == 2){ //If it isn't already wrong (No Press)
 						if(self.isTarget){ //If this was the target is should have been pressed
 							self.correct = false; 
 							self.pushed = false; 
@@ -351,14 +349,20 @@ function test(id, letter, isTarget, blockType, faceType){
  		else if(this.state == 2){//Showing the plus sign 
  			console.log("State == 2 AT PLUS SIGN");
  			//If this is a target 
- 			if(this.isTarget){
+ 			if(this.isTarget){	//Target hit on the plus sign is valid but late
  				this.stopTime(); //Stop the timer 
+ 				this.correct = true;
+ 				this.state = 4; //Move to correct state 
+ 			}
+ 			else{
+ 				this.correct = false; 	
+ 				this.state = 3; //Move to incorrect state  
  			}
 
 
  			this.pushed = true; 
- 			this.state = 3; //Move to incorrect state  
- 			this.correct = false; 	
+ 			
+ 			
 
  			
  		}

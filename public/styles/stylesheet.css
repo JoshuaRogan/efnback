@@ -6,8 +6,35 @@ body {
 .page-test-generations #efn_contaier,
 .page-home-js #efn_contaier,
 .page-beta #efn_contaier {
-  margin-top: 20px;
+  margin-top: 80px;
+  /* Small devices (tablets, 768px and up) */
+  /* Medium devices (desktops, 992px and up) */
+  /* Large devices (large desktops, 1200px and up) */
   font-size: 20px;
+}
+@media (min-width: 768px) {
+  .page-home #efn_contaier,
+  .page-test-generations #efn_contaier,
+  .page-home-js #efn_contaier,
+  .page-beta #efn_contaier {
+    margin-top: 50px;
+  }
+}
+@media (min-width: 992px) {
+  .page-home #efn_contaier,
+  .page-test-generations #efn_contaier,
+  .page-home-js #efn_contaier,
+  .page-beta #efn_contaier {
+    margin-top: 60px;
+  }
+}
+@media (min-width: 1200px) {
+  .page-home #efn_contaier,
+  .page-test-generations #efn_contaier,
+  .page-home-js #efn_contaier,
+  .page-beta #efn_contaier {
+    margin-top: 70px;
+  }
 }
 .page-home #efn_contaier #instructions_container,
 .page-test-generations #efn_contaier #instructions_container,
@@ -24,7 +51,7 @@ body {
   margin-left: 0;
   margin-right: 0;
   vertical-align: middle;
-  font-size: 24px;
+  font-size: 35px;
   /* Small devices (tablets, 768px and up) */
   /* Medium devices (desktops, 992px and up) */
   /* Large devices (large desktops, 1200px and up) */
@@ -34,7 +61,7 @@ body {
   .page-test-generations #efn_contaier .char,
   .page-home-js #efn_contaier .char,
   .page-beta #efn_contaier .char {
-    font-size: 26px;
+    font-size: 37px;
   }
 }
 @media (min-width: 992px) {
@@ -42,7 +69,7 @@ body {
   .page-test-generations #efn_contaier .char,
   .page-home-js #efn_contaier .char,
   .page-beta #efn_contaier .char {
-    font-size: 28px;
+    font-size: 40px;
   }
 }
 @media (min-width: 1200px) {
@@ -50,7 +77,7 @@ body {
   .page-test-generations #efn_contaier .char,
   .page-home-js #efn_contaier .char,
   .page-beta #efn_contaier .char {
-    font-size: 30px;
+    font-size: 44px;
   }
 }
 .page-home #efn_contaier #block-no-face .char,

@@ -15,8 +15,6 @@ $(document).ready(function() {
 			}
 			else{
 				efnback.started = true; 
-				$("#primary-action").html("Primary Action"); 
-				// $("#instructions_container").removeClass("hidden"); 
 				efnback.start(); 
 			}
 			
