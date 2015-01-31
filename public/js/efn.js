@@ -1,9 +1,16 @@
 /**
- *	Overall program 
+ *	EFNBack Class that contains the overall application. It contains block classes that contain the individual
+ *	tests that records the actual time. The program runs by polling the state of blocks and sending start commands when
+ *	they are finished running. 
  *	
+ *	The task is a series of 8 blocks where each block contains a 12 letter sequence. Each letter showing for 500ms and a fixation
+ *	cross showing for 3500ms after. It records accuracy and timing on hitting the appropriate letter. 
  *	
+ *	TODO: 
+ *		-Remove hard coded DOM manipulations
  */
  
+var DEBUG = false; //Debugging mode 
 
  function efnback(json){
  	var efnback = efnback || {};
@@ -21,6 +28,9 @@
  	this.blocks = Array(); //An array of blocks which contain the tests 
  	this.block_pointer = 0; 
 
+ 	this.sessionID = -1;
+ 	this.userID = -1;
+
  	//Build all of the blocks here json.blocks.length
  	for (var i = 0; i < efnback.numBlocks; i++) {
  		this.blocks[i] = new block(i, json.blocks[i]);
@@ -29,13 +39,15 @@
 
  	/**
  	 *	Run until all of the blocks are finished.
- 	 * 		-Don't use while (blocking)
+ 	 * 		-Uses SetInterval to avoid blocking
  	 *
  	 */
- 	 this.start = function(){
- 	 	console.log("Start EFN");
+ 	 this.start = function(sessionID, userID){
+ 	 	this.started = true; 
+ 	 	this.sessionID = sessionID;
+ 	 	this.userID = userID;
 
-		var self = this; 
+		var self = this; //Loses scope in setInterval
 		var myInterval = setInterval(function () {
  	 		//If the current block isn't started start it 
  	 		if(!self.blocks[self.block_pointer].started){
@@ -52,13 +64,12 @@
  	 			clearInterval(myInterval);//Stop the interval from repeating
  	 			self.finished = true; //Mark this block as finished  
 
- 	 			console.log("Entire Task Finished");
- 	 			console.log(self); 
+ 	 			if(DEBUG) console.log(self);
 
  	 			//Compute Stats 
  	 			var accuracy = self.getPercentCorrect();
  	 			var avgerageTime = self.getAverageTime();
- 	 			$("#efn_contaier").html("Accuracy = " + accuracy +" <br/> Average Time = " + avgerageTime);
+ 	 			$("#efn_contaier").html("Accuracy = " + accuracy +" <br/> Average Time = " + avgerageTime + "<br/> User Id: " + self.userID);
  	 		}
 
 
@@ -67,7 +78,7 @@
  	 }
 
  	/**
- 	 *	Determine what action to take when the button is pressed 
+ 	 *	Passes down the action to the appropraite block 
  	 *
  	 */
  	this.buttonPressed = function(){
@@ -77,7 +88,7 @@
 
  	
  	/**
- 	 *	Compute the average time if it needs to be recomputed 
+ 	 *	Computer the average response time on blocks that were pushed and are targets. 
  	 *
  	 */
  	this.getAverageTime = function(){
@@ -99,9 +110,9 @@
  	 	}
  	 	else{
 			var avgTime = totalTime/times; 
- 	 		console.log(totalTime, times) 
+ 	 		if(DEBUG) console.log(totalTime, times);
 
- 	 		return avgTime + "ms (" + totalTime + "ms/" + times +")";
+ 	 		return avgTime.toFixed(2) + "ms (" + totalTime + "ms/" + times +")";
  	 	}
 
  	 	
@@ -109,7 +120,7 @@
  	}
 
  	/**
- 	 *	Compute the number of tests that were correct 
+ 	 *	Return the number of tests correct / total number of tests 
  	 *
  	 */
  	 this.getPercentCorrect = function(){
@@ -125,13 +136,14 @@
  	 		}
  	 	}
 
- 	 	console.log(correct, total); 
+ 	 	if(DEBUG) console.log(correct, total); 
+
  	 	var percent = (correct / total) * 100; // Could just return this 
- 	 	return percent + "% (" + correct + "/" + total +")";
+ 	 	return percent.toFixed(2) + "% (" + correct + "/" + total +")";
  	}
 
  	/**
- 	 *	Send the reuslts to the serever 
+ 	 *	Send the reuslts to the server to update into the database upon completion.  
  	 *
  	 */
  	 this.sendResults = function(){
@@ -173,11 +185,11 @@ function block(id, json_block){
 
 
  	/**
- 	 *	
+ 	 *	Interval that constantly checks the tests to see if they are finished 
  	 *
  	 */
  	 this.start = function() {
- 	 	console.log("Block Starting"); 
+ 	 	
  	 	this.started = true; 
  	 	var self = this; 
  	 	var myInterval = setInterval(function () {
@@ -192,7 +204,7 @@ function block(id, json_block){
  	 		if(self.testPointer == 12){
  	 			clearInterval(myInterval);
  	 			self.finished = true; //Mark this block as finished 
- 	 			console.log(self.tests); 
+ 	 			if(DEBUG) console.log(self.tests); 
  	 		} 
 
  	 	}, 1);
@@ -203,7 +215,7 @@ function block(id, json_block){
  	 }
 
  	/**
- 	 *	Button press cascasded down from efnback
+ 	 *	Button press cascasded down from efnback. Pass it to the correct test object. 
  	 *
  	 */
  	this.buttonPressed = function(){
@@ -222,9 +234,11 @@ function block(id, json_block){
  *
  */
 function test(id, letter, isTarget, blockType, faceType){ 
-	this.letterShowTimeMS = 500; //Time that each letter appears on the screen
-	this.plusSignTimeMS = 3500; //Time that the + sign appears on the screen
-	this.directionsTimeMS = 3500; //Show the directions for 3.5s
+	var test = test || {};
+
+	test.letterShowTimeMS = 50; //Time that each letter appears on the screen
+	test.plusSignTimeMS = 35; //Time that the + sign appears on the screen
+	test.directionsTimeMS = 35; //Show the directions for 3.5s
 
 	this.id = id; //A unique identifier for this test (order of the items)
 
@@ -285,11 +299,11 @@ function test(id, letter, isTarget, blockType, faceType){
 							}
 						}
 						self.stop(); //Finish the test
-					},self.plusSignTimeMS);
+					},test.plusSignTimeMS);
 
-				}, self.letterShowTimeMS);
+				}, test.letterShowTimeMS);
 
-			}, self.directionsTimeMS);
+			}, test.directionsTimeMS);
 
 		}
 		else{//All other tests 
@@ -313,9 +327,9 @@ function test(id, letter, isTarget, blockType, faceType){
 					}
 
 					self.stop(); //Finish the test
-				},self.plusSignTimeMS);
+				},test.plusSignTimeMS);
 
-			}, self.letterShowTimeMS);
+			}, test.letterShowTimeMS);
 
 		}
 
@@ -330,24 +344,24 @@ function test(id, letter, isTarget, blockType, faceType){
  	 */
  	this.buttonPressed = function(){
  		if(this.state == 0){ //Not active
- 			console.log("State == 0 NOT ACTIVE");	//Don't do anything 
+ 			if(DEBUG) console.log("State == 0 NOT ACTIVE");	//Don't do anything 
  		}
  		else if(this.state == 1){//Showing the letter
  			this.pushed = true;	//This was pushed 
  			if(this.isTarget){
- 				console.log("State == 1 AT CHAR and isTarget");
+ 				if(DEBUG) console.log("State == 1 AT CHAR and isTarget");
  				this.stopTime(); //Stop the timer and set the results 
  				this.state = 4; //Correct 
  				this.correct = true; 
  			}
  			else{
- 				console.log("State == 1 AT CHAR but is control");
+ 				if(DEBUG) console.log("State == 1 AT CHAR but is control");
  				this.state = 3; //Wrong
  				this.correct = false; 
  			}
  		}
  		else if(this.state == 2){//Showing the plus sign 
- 			console.log("State == 2 AT PLUS SIGN");
+ 			if(DEBUG) console.log("State == 2 AT PLUS SIGN");
  			//If this is a target 
  			if(this.isTarget){	//Target hit on the plus sign is valid but late
  				this.stopTime(); //Stop the timer 
@@ -384,7 +398,7 @@ function test(id, letter, isTarget, blockType, faceType){
 		}
 		else if(stateNumber == 1){	//Letter Showing
 			this.state = 1; 
-			console.log(this.faceType);
+			
 
 			if(this.faceType == "none") {
 				this.switchToNoFace();
@@ -463,8 +477,6 @@ function test(id, letter, isTarget, blockType, faceType){
 		else if(this.faceType == "fear") imgsrc = "img/faces/fear/fear-" + img_index + ".jpg";
 		else if(this.faceType == "happy") imgsrc ="img/faces/happy/happy-" + img_index + ".jpg";
 
-		console.log(imgsrc);
-
 		$(".face").attr("src", imgsrc);
 	}
 
@@ -479,7 +491,7 @@ function test(id, letter, isTarget, blockType, faceType){
 		$("#block-face").removeClass("hidden");
 	}
 
-	/****PRIVATE METHODS****/
+
 
 
 }

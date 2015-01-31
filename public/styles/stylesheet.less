@@ -7,7 +7,7 @@ body{
 	font-family: "Courier New", Courier, monospace;
 	min-height: 100%;
 }
-.page-home, .page-test-generations, .page-home-js, .page-beta{
+.page-home, .page-test-generations, .page-home-js, .page-beta, .page-layout{
 	#efn_contaier{
 
 		margin-top: 80px;
@@ -36,8 +36,7 @@ body{
 				padding-right: 0; 
 				margin-left: 0;
 				margin-right: 0; 
-				vertical-align: middle; 
-				
+				vertical-align: middle;
 
 				font-size: 35px;
 
@@ -51,15 +50,26 @@ body{
 				@media (min-width: @screen-lg-min) {font-size: 44px; }
 		}
 
+		//Sections when there is only a character 
 		#block-no-face{
 			.char{
 				padding-top: 25px;
 			}
 		}
 
+		//Section with the two faces
 		#block-face{
 			.char{
-				padding-top: 10%;
+				padding-top: 15%;
+
+				/* Small devices (tablets, 768px and up) */
+				@media (min-width: @screen-sm-min) {padding-top: 17%;}
+
+				/* Medium devices (desktops, 992px and up) */
+				@media (min-width: @screen-md-min) {padding-top: 17%;}
+
+				/* Large devices (large desktops, 1200px and up) */
+				@media (min-width: @screen-lg-min) {padding-top: 10%;}
 			}
 
 			.face{
