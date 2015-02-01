@@ -2,15 +2,27 @@
 @import "bootstrap/variables.less";	
 @import "bootstrap/mixins.less";	
 
-//Add custom CSS
+
 body{
 	font-family: "Courier New", Courier, monospace;
 	min-height: 100%;
 }
-.page-home, .page-test-generations, .page-home-js, .page-beta, .page-layout{
-	#efn_contaier{
 
+
+//Add custom CSS
+.page-admin{
+	
+}
+
+
+
+.page-home, .page-test-generations, .page-home-js, .page-beta, .page-layout{
+	
+
+	#efn_contaier{
+		
 		margin-top: 80px;
+
 		/* Small devices (tablets, 768px and up) */
 		@media (min-width: @screen-sm-min) {margin-top: 50px; }
 
@@ -20,7 +32,8 @@ body{
 		/* Large devices (large desktops, 1200px and up) */
 		@media (min-width: @screen-lg-min) {margin-top: 70px;}
 
-
+		//Reduce margin top on small height devices 
+		@media (max-height: 400px) {margin-top: 0px; }
 
 		font-size: 20px;
 	
@@ -76,6 +89,26 @@ body{
 				display: inline !important; 
 				max-width: 100%;
 				height: auto;
+
+				/* Small devices (tablets, 768px and up) */
+				@media (min-width: @screen-sm-min) {max-width: 100%;}
+
+				/* Medium devices (desktops, 992px and up) */
+				@media (min-width: @screen-md-min) {max-width: 100%;}
+
+				/* Large devices (large desktops, 1200px and up) */
+				@media (min-width: @screen-lg-min) {max-width: 100%;}
+
+				//Reduce image size top on small height devices 
+				@media (max-height: 500px) {max-width: 80%;}
+				@media (max-height: 400px) {max-width: 70%;}
+				@media (max-height: 300px) {max-width: 60%;}
+				@media (max-height: 200px) {max-width: 50%;}
+
+				//Incra
+				@media (min-height: 500px) {max-width: 100%;}
+
+
 			}
 		}
 

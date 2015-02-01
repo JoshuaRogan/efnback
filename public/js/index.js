@@ -3,6 +3,11 @@ $(document).ready(function() {
 		$("#loading").addClass("hidden"); 
 		$("#loading").html(""); 
 
+		//Suggest what the session and user id's may be
+		suggestIDs();
+
+
+
 		efnback = new efnback(data);
 		console.log(data); 
 		
@@ -24,6 +29,8 @@ $(document).ready(function() {
 					efnback.start(sessionID, userID); //Start the task 
 					$("#test-variables").addClass("hidden");
 					$("#test-variables").html("");
+
+					//Store the session and userid variables 
 
 					console.log(efnback);
 				}
@@ -50,6 +57,13 @@ $(document).ready(function() {
 	});	
 });
 
+/**
+ *	Check cookies/web datastore for the user and session ids
+ *
+ */
+function suggestIDs(){
+	
+}
 
 
 /**

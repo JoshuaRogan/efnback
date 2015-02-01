@@ -40,6 +40,15 @@ body {
     margin-top: 70px;
   }
 }
+@media (max-height: 400px) {
+  .page-home #efn_contaier,
+  .page-test-generations #efn_contaier,
+  .page-home-js #efn_contaier,
+  .page-beta #efn_contaier,
+  .page-layout #efn_contaier {
+    margin-top: 0px;
+  }
+}
 .page-home #efn_contaier #instructions_container,
 .page-test-generations #efn_contaier #instructions_container,
 .page-home-js #efn_contaier #instructions_container,
@@ -141,4 +150,79 @@ body {
   display: inline !important;
   max-width: 100%;
   height: auto;
+  /* Small devices (tablets, 768px and up) */
+  /* Medium devices (desktops, 992px and up) */
+  /* Large devices (large desktops, 1200px and up) */
+}
+@media (min-width: 768px) {
+  .page-home #efn_contaier #block-face .face,
+  .page-test-generations #efn_contaier #block-face .face,
+  .page-home-js #efn_contaier #block-face .face,
+  .page-beta #efn_contaier #block-face .face,
+  .page-layout #efn_contaier #block-face .face {
+    max-width: 100%;
+  }
+}
+@media (min-width: 992px) {
+  .page-home #efn_contaier #block-face .face,
+  .page-test-generations #efn_contaier #block-face .face,
+  .page-home-js #efn_contaier #block-face .face,
+  .page-beta #efn_contaier #block-face .face,
+  .page-layout #efn_contaier #block-face .face {
+    max-width: 100%;
+  }
+}
+@media (min-width: 1200px) {
+  .page-home #efn_contaier #block-face .face,
+  .page-test-generations #efn_contaier #block-face .face,
+  .page-home-js #efn_contaier #block-face .face,
+  .page-beta #efn_contaier #block-face .face,
+  .page-layout #efn_contaier #block-face .face {
+    max-width: 100%;
+  }
+}
+@media (max-height: 500px) {
+  .page-home #efn_contaier #block-face .face,
+  .page-test-generations #efn_contaier #block-face .face,
+  .page-home-js #efn_contaier #block-face .face,
+  .page-beta #efn_contaier #block-face .face,
+  .page-layout #efn_contaier #block-face .face {
+    max-width: 80%;
+  }
+}
+@media (max-height: 400px) {
+  .page-home #efn_contaier #block-face .face,
+  .page-test-generations #efn_contaier #block-face .face,
+  .page-home-js #efn_contaier #block-face .face,
+  .page-beta #efn_contaier #block-face .face,
+  .page-layout #efn_contaier #block-face .face {
+    max-width: 70%;
+  }
+}
+@media (max-height: 300px) {
+  .page-home #efn_contaier #block-face .face,
+  .page-test-generations #efn_contaier #block-face .face,
+  .page-home-js #efn_contaier #block-face .face,
+  .page-beta #efn_contaier #block-face .face,
+  .page-layout #efn_contaier #block-face .face {
+    max-width: 60%;
+  }
+}
+@media (max-height: 200px) {
+  .page-home #efn_contaier #block-face .face,
+  .page-test-generations #efn_contaier #block-face .face,
+  .page-home-js #efn_contaier #block-face .face,
+  .page-beta #efn_contaier #block-face .face,
+  .page-layout #efn_contaier #block-face .face {
+    max-width: 50%;
+  }
+}
+@media (min-height: 500px) {
+  .page-home #efn_contaier #block-face .face,
+  .page-test-generations #efn_contaier #block-face .face,
+  .page-home-js #efn_contaier #block-face .face,
+  .page-beta #efn_contaier #block-face .face,
+  .page-layout #efn_contaier #block-face .face {
+    max-width: 100%;
+  }
 }

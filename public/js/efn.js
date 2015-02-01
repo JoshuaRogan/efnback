@@ -18,7 +18,8 @@ var DEBUG = false; //Debugging mode
  	efnback.numTests = 12; 
  	efnback.numBlocks = 8; 
  	efnback.numTargets = 5; 
- 	efnback.Blocktypes = ["0back", "2back"]
+ 	efnback.blocktypes = ["0back", "2back"];
+ 	efnback.processTaskURL = "/processTask";	//URL that handles the submission of the result and puts it into the database 
 
  	this.json = json;
 
@@ -147,7 +148,13 @@ var DEBUG = false; //Debugging mode
  	 *
  	 */
  	 this.sendResults = function(){
-
+ 	 	$.ajax({
+			url: efnback.processTaskURL,
+			type: "POST", 
+			data: JSON.stringify(this), //Send this entire object as JSON
+			contentType: "application/json", 
+			complete: callback
+		});
  	 }
 
 

@@ -9,16 +9,17 @@
  */
 
 class config extends global_config{
-	public static $pageTitle 			= "EFNBack | Admin Page"; 
-	public static $pageDescription 		= "Handle sessions data and inspect results from all trial runs. "; 
+	public static $pageTitle 			= "EFN Back | Task Processor"; //Won't be displayed
+	public static $pageDescription 		= "Process EFN Tasks sent via AJAX"; //Won't be displayed
 
 	public static $stylesheets 			= array(); //Include stylesheets 
-	public static $javascript 			= array("index"); //Include javascript files
+	public static $javascript 			= array(); //Include javascript files
+
 
 	public static $header				= false; //False if no header file otherwise the file name in the /app/views/includes/foo.php 
 	public static $footer 				= false;	//Same as header 
-
-
+	
+	public static $render 				= false; //Don't render this page 
 
 }
 ?>

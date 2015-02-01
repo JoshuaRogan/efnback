@@ -13,7 +13,7 @@ class config extends global_config{
 	public static $pageDescription 		= "Description for the homepage"; 
 
 	public static $stylesheets 			= array(); //Include stylesheets 
-	public static $javascript 			= array("index", "efn"); //Include javascript files
+	public static $javascript 			= array(); //Include javascript files
 
 
 	public static $header				= false; //False if no header file otherwise the file name in the /app/views/includes/foo.php 
