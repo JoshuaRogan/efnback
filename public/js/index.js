@@ -26,6 +26,11 @@ $(document).ready(function() {
 				
 
 				if(valid) {
+					
+					//Store the session and user id into local storage for later retreival
+					sessionStorage.setItem("sessionID", sessionID);
+					sessionStorage.setItem("userID", userID);
+
 					efnback.start(sessionID, userID); //Start the task 
 					$("#test-variables").addClass("hidden");
 					$("#test-variables").html("");
@@ -45,8 +50,6 @@ $(document).ready(function() {
 			var userID = $("#userID").val();
 
 			if(validForm(sessionID, userID)) valid = true; 
-
-
 		}); 
 
 		//Generate a unique user id 
@@ -58,11 +61,25 @@ $(document).ready(function() {
 });
 
 /**
- *	Check cookies/web datastore for the user and session ids
- *
+ *	Check local store for the user and session ids.
+ *		-If they are set update the fields
  */
 function suggestIDs(){
+
+	if(sessionStorage.getItem('sessionID')){
+		var sessionID = sessionStorage.getItem('sessionID');
+		$("#sessionID").val(sessionID);
+		$("#form-errors").html("<p class='text-warning'> <strong>Values were populated from the last test. Please make sure they are correct! </p>");
+	}
+
+	if(sessionStorage.getItem('userID')){
+		var userID = sessionStorage.getItem('userID');
+		$("#userID").val(userID); 
+		$("#form-errors").html("<p class='text-warning'> <strong>Values were populated from the last test. Please make sure they are correct! </p>");
+	}
+
 	
+
 }
 
 
@@ -83,7 +100,7 @@ function generateUID(){
  	// console.log(sessionID, userID);
 
  	//Validate the SESSION ID
- 	if(!$.isNumeric(sessionID) || sessionID < 1000000 || sessionID > 9000000){
+ 	if(!$.isNumeric(sessionID) || sessionID < 1000000 || sessionID > 9999999){
  		isValid = false; 
  		$("#sessionID").parent().addClass("has-error");
  	} 
@@ -93,7 +110,7 @@ function generateUID(){
  	}
 
  	//Validate the USER ID
- 	if(!$.isNumeric(userID) || userID < 1000000 || userID > 9000000) {
+ 	if(!$.isNumeric(userID) || userID < 1000000 || userID > 9999999) {
  		isValid = false; 
  		$("#userID").parent().addClass("has-error");
  	}
@@ -104,7 +121,7 @@ function generateUID(){
 
  	//Update the DOM with error messages 
  	if(!isValid){
- 		$("#form-errors").html("<p class='text-danger'> Please make sure you have a valid 7 digit session and user id! </p>");
+ 		$("#form-errors").html("<p class='text-danger'> <strong>Please make sure you have a valid 7 digit session and user id!</strong> </p>");
  	}
  	else{
  		$("#form-errors").html(""); // Clear the errors 

@@ -12,11 +12,11 @@ class config extends global_config{
 	public static $pageTitle 			= "Layout Testing"; 
 	public static $pageDescription 		= "Description for the homepage"; 
 
-	public static $stylesheets 			= array(); //Include stylesheets 
+	public static $stylesheets 			= array("styles/bootstrap.css", "styles/stylesheet.css"); //Include stylesheets 
 	public static $javascript 			= array(); //Include javascript files
 
 	public static $header				= false; //False if no header file otherwise the file name in the /app/views/includes/foo.php 
-	public static $footer 				= false;	//Same as header 
+	public static $footer 				= false;	//Same as header
 
 }
-?>
+?> 

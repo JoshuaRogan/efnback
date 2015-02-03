@@ -20,9 +20,18 @@ class mySQL{
 	//Check to if the id on the given table exists
 	public function exists($id, $table_name){
 		$query = "SELECT id FROM $table_name WHERE id = $id";
+		return $this->has_results($query); 
+
+		// $results = self::query($query); 
+		// $this->numQueries++;
+
+		// return ($results->num_rows > 0);
+	}
+
+	//Check to see if any results come back from a given query (generic from of exists)
+	public function has_results($query){
 		$results = self::query($query); 
 		$this->numQueries++;
-
 		return ($results->num_rows > 0);
 	}
 

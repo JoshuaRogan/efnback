@@ -21,6 +21,17 @@ var DEBUG = false; //Debugging mode
  	efnback.blocktypes = ["0back", "2back"];
  	efnback.processTaskURL = "/processTask";	//URL that handles the submission of the result and puts it into the database 
 
+ 	this.avgTime = -1; 
+ 	this.accuracy = -1; 
+
+ 	//Final Stats for the 0 back sequences
+ 	this.avgTimeM = -1;
+ 	this.accuracyM = -1;
+
+ 	//Final Stats for the 2 back sequences 
+ 	this.avgTimeABA = -1;
+ 	this.accuracyABA = -1;
+
  	this.json = json;
 
  	this.started = false; //Has the task been started 
@@ -62,15 +73,23 @@ var DEBUG = false; //Debugging mode
  	 			
  	 		//If the last block is finished 7
  	 		if(self.block_pointer == (efnback.numBlocks - 1) && self.blocks[self.block_pointer].finished){
+ 	 			$('html').unbind(); //Unbind the events here 
  	 			clearInterval(myInterval);//Stop the interval from repeating
  	 			self.finished = true; //Mark this block as finished  
 
  	 			if(DEBUG) console.log(self);
 
- 	 			//Compute Stats 
- 	 			var accuracy = self.getPercentCorrect();
- 	 			var avgerageTime = self.getAverageTime();
- 	 			$("#efn_contaier").html("Accuracy = " + accuracy +" <br/> Average Time = " + avgerageTime + "<br/> User Id: " + self.userID);
+ 	 			
+ 	 			//Compute and set the avg times and accuracy variables 
+ 	 			self.getAverageTime();
+ 	 			self.getAccuracy(); 
+
+ 	 			
+ 	 			$("#efn_contaier").html(self.printFinalStats());
+ 	 			$("#efn_contaier").append("<h3 class='text-center'> Session ID = " + self.sessionID + "</h3>");
+ 	 			$("#efn_contaier").append("<h3 class='text-center'> User ID = " + self.userID + "</h3>");
+ 	 			$("#efn_contaier").append("<br/> <a class='btn btn-default' href='javascript:void(0)' onclick='window.location.reload()' role='button'>Take Test Again</a>");
+ 	 			self.sendResults();
  	 		}
 
 
@@ -79,82 +98,183 @@ var DEBUG = false; //Debugging mode
  	 }
 
  	/**
- 	 *	Passes down the action to the appropraite block 
+ 	 *	Passes down the action to the appropriate block 
  	 *
  	 */
  	this.buttonPressed = function(){
  		this.blocks[this.block_pointer].buttonPressed(); 
  	}
  	
+ 	/**
+ 	 *	Print all of the final statistics 
+ 	 *
+ 	 */
+ 	 this.printFinalStats = function(){
+ 	 	if(this.avgTimeM == -1) this.getAverageTime(); //Make sure they are set 
+ 	 	if(this.accuracyM == -1) this.getAccuracy(); //Make sure they are set 
 
+ 	 	//Round all of the variables to 2 decimal places for display 
+ 	 	var accuracyMFormatted = this.accuracyM.toFixed(2); 
+ 	 	var accuracyABAFormatted = this.accuracyABA.toFixed(2); 
+
+ 	 	//Format the values for display 
+ 	 	if($.isNumeric(this.avgTimeM)){
+ 	 		var avgTimeMFormatted = this.avgTimeM.toFixed(2); 
+ 	 		var msDisplay = "ms"; 
+ 	 	} 
+ 	 	else {
+ 	 		var avgTimeMFormatted = this.avgTimeM; 
+ 	 		var msDisplay = ""; 
+ 	 	}
+
+ 	 	if($.isNumeric(this.avgTimeABA)) var avgTimeABAFormatted = this.avgTimeABA.toFixed(2); 
+ 	 	else var avgTimeABAFormatted = this.avgTimeABA;
+ 	 	
+ 	 
+
+ 	 	//Build the HTML table (Messy looking)
+ 	 	var htmlTable = "<table class='table table-condensed'><thead><tr><th>Type</th><th>Accuracy</th><th>Reaction Time</th></tr></thead><tbody><tr><td>M</td><td>" +
+ 	 		accuracyMFormatted + "%</td> <td> " + avgTimeMFormatted + msDisplay + "</td> </tr> <tr> <td>ABA</td> <td> " + accuracyABAFormatted + "%</td> <td> " +
+ 	 		avgTimeABAFormatted +  msDisplay + "</td></tr></tbody></table>";
+
+ 		return htmlTable; 
+
+ 
+ 	 }
  	
  	/**
  	 *	Computer the average response time on blocks that were pushed and are targets. 
  	 *
  	 */
- 	this.getAverageTime = function(){
- 	 	var totalTime = 0;
- 	 	var times = 0;  
+ 	this.getAverageTime = function(){  
+ 	 	var totalTimeM = 0; 
+ 	 	var numTimesM = 0; 
 
+ 	 	var totalTimeABA = 0;
+ 	 	var numTimesABA = 0; 
  	 	for(var i = 0; i < this.blocks.length; i++){
  	 		for(var j = 0; j < this.blocks[i].tests.length; j++){
  	 			if(this.blocks[i].tests[j].isTarget && this.blocks[i].tests[j].pushed){
- 	 				times++;
- 	 				totalTime += this.blocks[i].tests[j].timeMS; 
+ 	 				
+ 	 				//Compute the 0back times
+ 	 				if(this.blocks[i].type == "0-back"){
+ 	 					totalTimeM += this.blocks[i].tests[j].timeMS;
+ 	 					numTimesM++;
+ 	 				}
+ 	 				else{ //2 bback times
+ 	 					totalTimeABA += this.blocks[i].tests[j].timeMS;
+ 	 					numTimesABA++;
+ 	 				}
+
+ 	
  	 			}
 
  	 		}
  	 	}
 
- 	 	if(times == 0 ){
- 	 		return  "No targets hit";
+ 	 	if(numTimesM == 0){
+ 	 		var avgTimeM = "No Targets Hit"; 
  	 	}
  	 	else{
-			var avgTime = totalTime/times; 
- 	 		if(DEBUG) console.log(totalTime, times);
-
- 	 		return avgTime.toFixed(2) + "ms (" + totalTime + "ms/" + times +")";
+ 	 		var avgTimeM = totalTimeM/numTimesM; //Compute the average time for 0back sequences 
  	 	}
+
+ 	 	if(numTimesABA == 0){
+ 	 		var avgTimeABA = "No Targets Hit"; //Compute the average time for 2back sequences 
+
+ 	 	}
+ 	 	else{
+			var avgTimeABA = totalTimeABA/numTimesABA; //Compute the average time for 2back sequences 
+ 	 	}
+
+
+
+
+		//Set the object variables 
+		this.avgTimeM = avgTimeM;
+		this.avgTimeABA = avgTimeABA;
+
+	 	if(DEBUG) console.log(avgTimeABA, avgTimeM);
+
+ 	 	
 
  	 	
 
  	}
 
  	/**
- 	 *	Return the number of tests correct / total number of tests 
+ 	 *	Set the number of tests correct / total number of tests for 0 back
+ 	 *	and 2 back individually 
  	 *
  	 */
- 	 this.getPercentCorrect = function(){
- 	 	var correct = 0;
- 	 	var total = 0;  
+ 	 this.getAccuracy = function(){
+ 	 	var correctM = 0 
+ 	 	var correctABA = 0;
+
+ 	 	var totalM = 0; 
+ 	 	var totalABA = 0; 
+
 
  	 	for(var i = 0; i < this.blocks.length; i++){
  	 		for(var j = 0; j < this.blocks[i].tests.length; j++){
- 	 			if(this.blocks[i].tests[j].isTarget && this.blocks[i].tests[j].pushed) correct++;
- 	 			else if(!this.blocks[i].tests[j].isTarget && !this.blocks[i].tests[j].pushed) correct++; 
+ 	 			//Pushed target 
+ 	 			if(this.blocks[i].tests[j].isTarget && this.blocks[i].tests[j].pushed){
+ 	 				 //Compute for 0back
+ 	 				 if(this.blocks[i].type == "0-back"){
+ 	 				 	correctM++;
+ 	 				 }
+ 	 				 else{//Compute for 2 back
+ 	 				 	correctABA++;
+ 	 				 }
+ 	 			}
+ 	 			//No Pushed control 
+ 	 			else if(!this.blocks[i].tests[j].isTarget && !this.blocks[i].tests[j].pushed){
+ 	 				 //Compute for 0back
+ 	 				 if(this.blocks[i].type == "0-back"){
+ 	 				 	correctM++;
+ 	 				 }
+ 	 				 else{//Compute for 2 back
+ 	 				 	correctABA++;
+ 	 				 }
+ 	 			} 
 
- 	 			total++;
+ 	 			//Compute totals 
+ 	 			if(this.blocks[i].type == "0-back"){
+ 	 				totalM++;
+ 	 			}
+ 	 			else{//Compute for 2 back
+ 	 				totalABA++;
+ 	 			}
+
+ 	 			
  	 		}
  	 	}
 
- 	 	if(DEBUG) console.log(correct, total); 
+ 	 	//Set the values for this object 
+ 	 	this.accuracyM = (correctM / totalM) * 100; 
+ 	 	this.accuracyABA = (correctABA / totalABA) * 100; 
 
- 	 	var percent = (correct / total) * 100; // Could just return this 
- 	 	return percent.toFixed(2) + "% (" + correct + "/" + total +")";
+
  	}
 
  	/**
- 	 *	Send the reuslts to the server to update into the database upon completion.  
+ 	 *	Send the results to the server to update into the database upon completion.  
  	 *
  	 */
  	 this.sendResults = function(){
+ 		this.json = null; //Don't need to send this 
+
  	 	$.ajax({
-			url: efnback.processTaskURL,
+			url: "/processTask",
 			type: "POST", 
-			data: JSON.stringify(this), //Send this entire object as JSON
-			contentType: "application/json", 
-			complete: callback
+			data: {data: JSON.stringify(this)}, //Send this entire object as JSON
+			// contentType: "application/json", 
+			complete: function(html){
+				console.log(html.responseText);
+			}
 		});
+
+		
  	 }
 
 
@@ -222,7 +342,7 @@ function block(id, json_block){
  	 }
 
  	/**
- 	 *	Button press cascasded down from efnback. Pass it to the correct test object. 
+ 	 *	Button press cascaded down from efnback. Pass it to the correct test object. 
  	 *
  	 */
  	this.buttonPressed = function(){
@@ -243,9 +363,9 @@ function block(id, json_block){
 function test(id, letter, isTarget, blockType, faceType){ 
 	var test = test || {};
 
-	test.letterShowTimeMS = 50; //Time that each letter appears on the screen
-	test.plusSignTimeMS = 35; //Time that the + sign appears on the screen
-	test.directionsTimeMS = 35; //Show the directions for 3.5s
+	test.letterShowTimeMS = 500; //Time that each letter appears on the screen
+	test.plusSignTimeMS = 3500; //Time that the + sign appears on the screen
+	test.directionsTimeMS = 3500; //Show the directions for 3.5s
 
 	this.id = id; //A unique identifier for this test (order of the items)
 

@@ -12,7 +12,7 @@ class config extends global_config{
 	public static $pageTitle 			= "EFN Back "; 
 	public static $pageDescription 		= "Description for the homepage"; 
 
-	public static $stylesheets 			= array(); //Include stylesheets 
+	public static $stylesheets 			= array("styles/bootstrap.css", "styles/stylesheet.css"); //Include stylesheets 
 	public static $javascript 			= array("index", "efn"); //Include javascript files
 
 

@@ -19,6 +19,7 @@
 			<label for="userID">User ID</label>
 			<input type="text" class="form-control" id="userID" placeholder="User ID" required >
 		</div>
+		<br/>
 			<button type="button" class="btn btn-default" id="start-test">Start the Test!</button>
 			<button type="button" class="btn btn-success" id="generate-uid">Generate User ID</button>
 		</form>

@@ -12,8 +12,8 @@ class config extends global_config{
 	public static $pageTitle 			= "EFNBack | Admin Page"; 
 	public static $pageDescription 		= "Handle sessions data and inspect results from all trial runs. "; 
 
-	public static $stylesheets 			= array(); //Include stylesheets 
-	public static $javascript 			= array("index"); //Include javascript files
+	public static $stylesheets 			= array("styles/admin.css"); //Include stylesheets 
+	public static $javascript 			= array("admin"); //Include javascript files
 
 	public static $header				= false; //False if no header file otherwise the file name in the /app/views/includes/foo.php 
 	public static $footer 				= false;	//Same as header 

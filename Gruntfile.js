@@ -9,6 +9,8 @@ module.exports = function(grunt) {
         files: {
           "public/styles/bootstrap.css": "public/styles/bootstrap/bootstrap.less",
           "public/styles/stylesheet.css": "public/styles/stylesheet.less",
+          // "public/styles/bootstrap-admin.css": "public/styles/bootstrap-admin/bootstrap.less",
+          "public/styles/admin.css": "public/styles/admin.less"
         }
       }
     },

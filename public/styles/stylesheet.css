@@ -226,3 +226,10 @@ body {
     max-width: 100%;
   }
 }
+.page-home #efn_contaier #test-variables .btn,
+.page-test-generations #efn_contaier #test-variables .btn,
+.page-home-js #efn_contaier #test-variables .btn,
+.page-beta #efn_contaier #test-variables .btn,
+.page-layout #efn_contaier #test-variables .btn {
+  margin-top: 10px;
+}
