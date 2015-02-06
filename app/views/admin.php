@@ -7,10 +7,13 @@
  */
 class ASTable{
 	public $session_id, $user_id;
+	public $stats; //Holds the test_stats object 
 	public $rows = array(); //Stores all of the rows 
 
+
 	public static $tables = array(); //Holds all of the AS tables 
-	public static $num_tables = 0; 
+	public static $num_tables = 0;
+
 
 	public function __construct($session_id, $user_id){
 		$this->session_id = $session_id;
@@ -19,14 +22,9 @@ class ASTable{
 		self::$tables[] = $this; 
 	}
 
-
-	public function add_row($avg_reaction_time_m, $accuracy_m, $avg_reaction_time_aba, $accuracy_aba){
-		$this->rows[] = array(
-			"avg_reaction_time_m" => $avg_reaction_time_m,
-			"accuracy_m" =>  $accuracy_m,
-			"avg_reaction_time_aba" =>  $avg_reaction_time_aba,
-			"accuracy_aba" =>  $accuracy_aba,
-		);
+	//Add a row using the stats object 
+	public function add_row_stats($stats){
+		$this->stats = $stats; 
 	}
 
 	public function gen_table(){
@@ -37,35 +35,33 @@ class ASTable{
 			<table class='as-table table table-hover table-striped table-responsive'>
 				<thead>
 					<tr>
-						<th>Average Reaction Time M</th>
-						<th>Accuracy M </th>
-						<th>Average Reaction Time ABA</th>
-						<th>Accuracy ABA </th>
+						<th>Avg. Reaction M No Faces</th> 
+						<th>Accuracy M No Faces</th> 
+						<th>Avg. Reaction M Faces</th> 
+						<th>Accuracy M Faces</th> 
+
+						<th>Avg. Reaction ABA No Faces</th> 
+						<th>Accuracy ABA No Faces</th> 
+						<th>Avg. Reaction ABA Faces</th> 
+						<th>Accuracy ABA Faces</th> 
+
+						<th>Avg. Reaction Faces</th> 
+						<th>Accuracy Faces</th> 
+						<th>Avg. Reaction No Faces</th> 
+						<th>Accuracy No Faces</th> 
 					</tr>
 				</thead>
 
 			<tbody>";
 
-		//Print all of the rows
-		foreach($this->rows as $row){
-			echo "<tr>
-				<td> {$row['avg_reaction_time_m']}ms</td>
-				<td> {$row['accuracy_m']}%</td>
-				<td> {$row['avg_reaction_time_aba']}%</td>
-				<td> {$row['accuracy_aba']}ms</td>
-			</tr>
-		";
-		}
+
+			echo $this->stats->enumerate_values_table_row(); //Print out the row of data 
+		
 
 		//Close the table 
 		echo "</tbody></table>";
-
-		
 	}
 
-	public static function gen_all_tables(){
-
-	}
 }
 
 //Class to build the SUTA(Session User Test all) data table 
@@ -174,9 +170,6 @@ $admin = new efnbackAdmin();
 $allTests = $admin->get_all_tests();
 
 
-$allTests = $admin->get_all_tests();
-
-
 if($allTests){
 	$prev_session = false; //Session of the last row
 	$prev_user = false;	//User of the last row
@@ -184,7 +177,11 @@ if($allTests){
 
 	$sutaTable = false; //Suta table
 	$ASTable = false; //As table 
+
 	foreach($allTests as $row){
+		$stats = new test_stats(); //Stats variable to hold all of the aggregrate stats 
+		$stats->set_vars_SQL($row); //Sets all of the variables in the object from an SQL row
+
 		//Initialize prev session tracker and start a new table 
 		if($prev_session == false){ // First time 
 			$prev_session = $row['session_id']; 
@@ -194,28 +191,28 @@ if($allTests){
 
 			$sutaTable = new sutaTable($row['session_id'],$row['user_id'], $row['test_id']);
 			$sutaTable->add_row($row['block_type'],$row['letter_type'],$row['reaction_time'],$row['is_correct']);
-			$sutaTable->ASTable->add_row($row['avg_reaction_time_m'],$row['accuracy_m'], $row['avg_reaction_time_aba'], $row['accuracy_aba']);
 		}
 		else{
 			
 			//New Session 
 			if($prev_session != $row['session_id']){
 				$sutaTable = new sutaTable($row['session_id'],$row['user_id'], $row['test_id']);
-				$sutaTable->ASTable->add_row($row['avg_reaction_time_m'],$row['accuracy_m'], $row['avg_reaction_time_aba'], $row['accuracy_aba']);
 			}
 			//New Test 
 			else if($prev_test_id != $row['test_id']){
 				$sutaTable = new sutaTable($row['session_id'],$row['user_id'], $row['test_id']);
-				$sutaTable->ASTable->add_row($row['avg_reaction_time_m'],$row['accuracy_m'], $row['avg_reaction_time_aba'], $row['accuracy_aba']);
 			}
 			//New User
 			else if($prev_user != $row['user_id']){
 				$sutaTable = new sutaTable($row['session_id'],$row['user_id'], $row['test_id']);
-				$sutaTable->ASTable->add_row($row['avg_reaction_time_m'],$row['accuracy_m'], $row['avg_reaction_time_aba'], $row['accuracy_aba']);
 			}
 
 			$sutaTable->add_row($row['block_type'],$row['letter_type'],$row['reaction_time'],$row['is_correct']);
 		}
+
+		$sutaTable->ASTable->add_row_stats($stats); //Always add the aggregate stats row
+
+
 
 
 		//Move the previous trackers to the next one 

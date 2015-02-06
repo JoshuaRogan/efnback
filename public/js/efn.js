@@ -21,6 +21,27 @@ var DEBUG = false; //Debugging mode
  	efnback.blocktypes = ["0back", "2back"];
  	efnback.processTaskURL = "/processTask";	//URL that handles the submission of the result and puts it into the database 
 
+ 	//Aggregate statistics on this run 
+ 	this.stats = {
+ 		mFacesAvgTime: -1.0, 
+ 		mFacesAccuracy: -1.0, 
+
+ 		mNoFacesAvgTime: -1.0, 
+ 		mNoFacesAccuracy: -1.0,
+
+ 		ABAFacesAvgTime: -1.0, 
+ 		ABAFacesAccuracy: -1.0, 
+
+ 		ABANoFacesAvgTime: -1.0, 
+ 		ABANoFacesAccuracy: -1.0,
+
+ 		facesAccuracy: -1.0, 
+ 		facesAvgTime: -1.0,
+
+ 		noFacesAccuracy: -1.0,
+ 		noFacesAvgTime: -1.0
+ 	}
+
  	this.avgTime = -1; 
  	this.accuracy = -1; 
 
@@ -80,10 +101,8 @@ var DEBUG = false; //Debugging mode
  	 			if(DEBUG) console.log(self);
 
  	 			
- 	 			//Compute and set the avg times and accuracy variables 
- 	 			self.getAverageTime();
- 	 			self.getAccuracy(); 
-
+ 	 			//Set all of the stats values 
+ 	 			self.computeStats(); 
  	 			
  	 			$("#efn_contaier").html(self.printFinalStats());
  	 			$("#efn_contaier").append("<h3 class='text-center'> Session ID = " + self.sessionID + "</h3>");
@@ -110,149 +129,233 @@ var DEBUG = false; //Debugging mode
  	 *
  	 */
  	 this.printFinalStats = function(){
- 	 	if(this.avgTimeM == -1) this.getAverageTime(); //Make sure they are set 
- 	 	if(this.accuracyM == -1) this.getAccuracy(); //Make sure they are set 
-
- 	 	//Round all of the variables to 2 decimal places for display 
- 	 	var accuracyMFormatted = this.accuracyM.toFixed(2); 
- 	 	var accuracyABAFormatted = this.accuracyABA.toFixed(2); 
-
- 	 	//Format the values for display 
- 	 	if($.isNumeric(this.avgTimeM)){
- 	 		var avgTimeMFormatted = this.avgTimeM.toFixed(2); 
- 	 		var msDisplay = "ms"; 
- 	 	} 
- 	 	else {
- 	 		var avgTimeMFormatted = this.avgTimeM; 
- 	 		var msDisplay = ""; 
- 	 	}
-
- 	 	if($.isNumeric(this.avgTimeABA)) var avgTimeABAFormatted = this.avgTimeABA.toFixed(2); 
- 	 	else var avgTimeABAFormatted = this.avgTimeABA;
- 	 	
- 	 
-
  	 	//Build the HTML table (Messy looking)
- 	 	var htmlTable = "<table class='table table-condensed'><thead><tr><th>Type</th><th>Accuracy</th><th>Reaction Time</th></tr></thead><tbody><tr><td>M</td><td>" +
- 	 		accuracyMFormatted + "%</td> <td> " + avgTimeMFormatted + msDisplay + "</td> </tr> <tr> <td>ABA</td> <td> " + accuracyABAFormatted + "%</td> <td> " +
- 	 		avgTimeABAFormatted +  msDisplay + "</td></tr></tbody></table>";
+
+
+ 	 	//Way to messy probably a better way to build the table 
+ 	 	var htmlTable = "<table class='table table-condensed'><thead><tr><th>Type</th><th>Accuracy</th><th>Reaction Time (ms)</th></tr></thead><tbody><tr><td>M Faces</td><td>" +
+ 	 		this.stats.mFacesAccuracy.toFixed(2) + "%</td> <td> " + isFixedIfNumeric(this.stats.mFacesAvgTime, 2)  + "</td> </tr> <tr> <td>M No Faces</td> <td> " + this.stats.mNoFacesAccuracy.toFixed(2) + "%</td> <td> " +
+ 	 		isFixedIfNumeric(this.stats.mNoFacesAvgTime,2) + "</td></tr><tr> <td>ABA Faces</td> <td> " + this.stats.ABAFacesAccuracy.toFixed(2) + "%</td><td>" + isFixedIfNumeric(this.stats.ABAFacesAvgTime,2) + "</td></tr><tr> <td>ABA No Faces</td> <td> " +
+ 	 		this.stats.ABANoFacesAccuracy.toFixed(2) + "%</td><td>" + isFixedIfNumeric(this.stats.ABANoFacesAvgTime,2) + "</td></tr> <tr> <td>Faces</td> <td> " + this.stats.facesAccuracy.toFixed(2) + "%</td><td>" + isFixedIfNumeric(this.stats.facesAvgTime,2) + 
+ 	 		"</td></tr><tr> <td>No Faces</td> <td> " + this.stats.noFacesAccuracy.toFixed(2) + "%</td><td>" + isFixedIfNumeric(this.stats.noFacesAvgTime,2) + "</td></tr></tbody></table>";
 
  		return htmlTable; 
-
- 
  	 }
- 	
+
  	/**
- 	 *	Computer the average response time on blocks that were pushed and are targets. 
+ 	 *	Compute all of the statistics for this trial 
+ 	 *
  	 *
  	 */
- 	this.getAverageTime = function(){  
- 	 	var totalTimeM = 0; 
- 	 	var numTimesM = 0; 
+ 	 this.computeStats = function (){
+		this.getAverages(); //Get all of the average stats
+		this.getAccuracy(); //Compute all of the accuracy
+ 	 }
 
- 	 	var totalTimeABA = 0;
- 	 	var numTimesABA = 0; 
+
+
+ 	
+ 	/**
+ 	 *	Compute the average reaction time for: 
+ 	 *		-M No Faces
+ 	 *		-M Faces
+ 	 *		-ABA No Faces
+ 	 *		-ABA Faces
+ 	 */
+ 	this.getAverages = function(){  
+		//0back
+		var numMFaces 		= 0;
+		var timeMFaces		= 0; 
+		var numMNoFaces 	= 0; 
+		var timeMNoFaces 	= 0; 
+		//2Back
+		var numABAFaces 	= 0; 
+		var timeABAFaces 	= 0; 
+		var numABANoFaces	= 0; 
+		var timeABANoFaces 	= 0; 
+
+		//totals
+		var numFaces 		= 0; 
+		var timeFaces 		= 0; 
+		var numNoFaces 		= 0; 
+		var timeNoFaces 	= 0; 
+
+
  	 	for(var i = 0; i < this.blocks.length; i++){
  	 		for(var j = 0; j < this.blocks[i].tests.length; j++){
  	 			if(this.blocks[i].tests[j].isTarget && this.blocks[i].tests[j].pushed){
  	 				
- 	 				//Compute the 0back times
+ 	 				//Compute the 0back times this.blocks[i].faceType == "none"
  	 				if(this.blocks[i].type == "0-back"){
- 	 					totalTimeM += this.blocks[i].tests[j].timeMS;
- 	 					numTimesM++;
+ 	 					
+ 	 					//Check to see if there was a face
+ 	 					if(this.blocks[i].faceType == "none"){
+ 	 						numMNoFaces++;
+ 	 						timeMNoFaces += this.blocks[i].tests[j].timeMS;
+
+ 	 						numNoFaces++;
+ 	 						timeNoFaces += this.blocks[i].tests[j].timeMS;
+ 	 					}
+ 	 					else{
+ 	 						numMFaces++;
+ 	 						timeMFaces += this.blocks[i].tests[j].timeMS;
+
+ 	 						numFaces++;
+ 	 						timeFaces += this.blocks[i].tests[j].timeMS;
+ 	 					}
+
  	 				}
  	 				else{ //2 bback times
- 	 					totalTimeABA += this.blocks[i].tests[j].timeMS;
- 	 					numTimesABA++;
+ 	 					//Check to see if there was a face
+ 	 					if(this.blocks[i].faceType == "none"){
+ 	 						numABANoFaces++;
+ 	 						timeABANoFaces += this.blocks[i].tests[j].timeMS;
+
+ 	 						numNoFaces++;
+ 	 						timeNoFaces += this.blocks[i].tests[j].timeMS;
+ 	 					}
+ 	 					else{
+ 	 						numABAFaces++;
+ 	 						timeABAFaces += this.blocks[i].tests[j].timeMS;
+
+ 	 						numFaces++;
+ 	 						timeFaces += this.blocks[i].tests[j].timeMS;
+ 	 					}
  	 				}
-
- 	
  	 			}
-
  	 		}
  	 	}
 
- 	 	if(numTimesM == 0){
- 	 		var avgTimeM = "No Targets Hit"; 
- 	 	}
- 	 	else{
- 	 		var avgTimeM = totalTimeM/numTimesM; //Compute the average time for 0back sequences 
- 	 	}
+ 	 	console.log(numMNoFaces, timeMNoFaces);
 
- 	 	if(numTimesABA == 0){
- 	 		var avgTimeABA = "No Targets Hit"; //Compute the average time for 2back sequences 
+ 		//Set all of the stats 
+ 	 	if(numMNoFaces == 0) this.stats.mNoFacesAvgTime = "No Hits"; 
+ 	 	else this.stats.mNoFacesAvgTime = timeMNoFaces / numMNoFaces;
 
- 	 	}
- 	 	else{
-			var avgTimeABA = totalTimeABA/numTimesABA; //Compute the average time for 2back sequences 
- 	 	}
+ 	 	if(numMFaces == 0) this.stats.mFacesAvgTime = "No Hits"; 
+ 	 	else this.stats.mFacesAvgTime = timeMFaces / numMFaces;
 
+ 	 	if(numABANoFaces == 0) this.stats.ABANoFacesAvgTime = "No Hits"; 
+ 	 	else this.stats.ABANoFacesAvgTime = timeABANoFaces / numABANoFaces;
 
+ 	 	if(numABAFaces == 0) this.stats.ABAFacesAvgTime = "No Hits"; 
+ 	 	else this.stats.ABAFacesAvgTime = timeABAFaces / numABAFaces;
 
+ 	 	if(numFaces == 0) this.stats.facesAvgTime = "No Hits";
+ 	 	else this.stats.facesAvgTime = timeFaces / numFaces;
 
-		//Set the object variables 
-		this.avgTimeM = avgTimeM;
-		this.avgTimeABA = avgTimeABA;
+ 	 	if(numNoFaces == 0) this.stats.noFacesAvgTime = "No Hits"; 
+ 	 	else this.stats.noFacesAvgTime = timeNoFaces / numNoFaces;
 
-	 	if(DEBUG) console.log(avgTimeABA, avgTimeM);
-
- 	 	
-
- 	 	
 
  	}
 
  	/**
- 	 *	Set the number of tests correct / total number of tests for 0 back
- 	 *	and 2 back individually 
- 	 *
+ 	 *	Compute the average reaction time for: 
+ 	 *		-M No Faces
+ 	 *		-M Faces
+ 	 *		-ABA No Faces
+ 	 *		-ABA Faces
  	 */
  	 this.getAccuracy = function(){
- 	 	var correctM = 0 
- 	 	var correctABA = 0;
+ 	 	//0back
+ 	 	var totalMFaces 		= 0;
+ 	 	var accurateMFaces 		= 0;
+ 	 	var totalMNoFaces 		= 0; 
+ 	 	var accurateMNoFaces 	= 0;
 
- 	 	var totalM = 0; 
- 	 	var totalABA = 0; 
+ 	 	//2back
+ 	 	var totalABAFaces	 	= 0;
+ 	 	var accurateABAFaces	= 0;
+ 	 	var totalABANoFaces		= 0; 
+ 	 	var accurateABANoFaces 	= 0; 
+
+		//totals
+		var numFaces 			= 0; 
+		var accurateFaces 		= 0; 
+		var numNoFaces 			= 0; 
+		var accurateNoFaces 	= 0; 
+
 
 
  	 	for(var i = 0; i < this.blocks.length; i++){
  	 		for(var j = 0; j < this.blocks[i].tests.length; j++){
- 	 			//Pushed target 
- 	 			if(this.blocks[i].tests[j].isTarget && this.blocks[i].tests[j].pushed){
- 	 				 //Compute for 0back
+ 	 			//Pushed target = Correct || Not Pushed Target = Correct 
+ 	 			if((this.blocks[i].tests[j].isTarget && this.blocks[i].tests[j].pushed) || (!this.blocks[i].tests[j].isTarget && !this.blocks[i].tests[j].pushed)){
+ 	 				 
+ 	 				 //0Back (M)
  	 				 if(this.blocks[i].type == "0-back"){
- 	 				 	correctM++;
- 	 				 }
- 	 				 else{//Compute for 2 back
- 	 				 	correctABA++;
- 	 				 }
- 	 			}
- 	 			//No Pushed control 
- 	 			else if(!this.blocks[i].tests[j].isTarget && !this.blocks[i].tests[j].pushed){
- 	 				 //Compute for 0back
- 	 				 if(this.blocks[i].type == "0-back"){
- 	 				 	correctM++;
- 	 				 }
- 	 				 else{//Compute for 2 back
- 	 				 	correctABA++;
- 	 				 }
- 	 			} 
+ 	 				 	//Check to see if there was a face
+ 	 					if(this.blocks[i].faceType == "none"){
+ 	 						 accurateMNoFaces++;
+ 	 						 totalMNoFaces++;
 
- 	 			//Compute totals 
- 	 			if(this.blocks[i].type == "0-back"){
- 	 				totalM++;
- 	 			}
- 	 			else{//Compute for 2 back
- 	 				totalABA++;
- 	 			}
+ 	 						 numNoFaces++;
+ 	 						 accurateNoFaces++;
+ 	 					}
+ 	 					else{
+ 	 						accurateMFaces++;
+ 	 						totalMFaces++;
 
- 	 			
+ 	 						numFaces++;
+ 	 						accurateFaces++;
+ 	 					}
+ 	 				 }
+ 	 				 else{ //2back (ABA)
+ 	 				 	//Check to see if there was a face
+ 	 					if(this.blocks[i].faceType == "none"){
+ 	 						accurateABANoFaces++;
+ 	 						totalABANoFaces++;
+
+ 	 						numNoFaces++;
+ 	 						accurateNoFaces++;
+ 	 					}
+ 	 					else{
+ 	 						accurateABAFaces++;
+ 	 						totalABAFaces++;
+
+ 	 						numFaces++;
+ 	 						accurateFaces++;
+ 	 					}
+ 	 				 }
+ 	 			}
+ 	 			else{ //Incorrect just add to the totals 
+ 	 					//0Back (M)
+ 	 				if(this.blocks[i].type == "0-back"){
+ 	 				 	//Check to see if there was a face
+ 	 					if(this.blocks[i].faceType == "none"){
+ 	 						 totalMNoFaces++;
+ 	 						 numNoFaces++;
+
+ 	 					}
+ 	 					else{
+ 	 						totalMFaces++;
+ 	 						numFaces++;
+ 	 					}
+ 	 				}
+ 	 				else{ //2back (ABA)
+ 	 				 	//Check to see if there was a face
+ 	 					if(this.blocks[i].faceType == "none"){
+ 	 						totalABANoFaces++;
+ 	 						numNoFaces++;
+
+ 	 					}
+ 	 					else{
+ 	 						totalABAFaces++;
+ 	 						numFaces++;
+ 	 					}
+ 	 				}
+ 	 			}	
  	 		}
  	 	}
 
- 	 	//Set the values for this object 
- 	 	this.accuracyM = (correctM / totalM) * 100; 
- 	 	this.accuracyABA = (correctABA / totalABA) * 100; 
+ 	 	//Set the values for the stats object 
+ 	 	this.stats.mFacesAccuracy = (accurateMFaces / totalMFaces) * 100;
+ 	 	this.stats.mNoFacesAccuracy = (accurateMNoFaces / totalMNoFaces) * 100;
+ 	 	this.stats.ABAFacesAccuracy = (accurateABAFaces / totalABAFaces) * 100;
+ 	 	this.stats.ABANoFacesAccuracy = (accurateABANoFaces / totalABANoFaces) * 100;
+ 	 	this.stats.facesAccuracy = (accurateFaces / numFaces) * 100;
+ 	 	this.stats.noFacesAccuracy = (accurateNoFaces / numNoFaces) * 100;
 
 
  	}
@@ -617,8 +720,10 @@ function test(id, letter, isTarget, blockType, faceType){
 		$("#block-no-face").addClass("hidden");
 		$("#block-face").removeClass("hidden");
 	}
+}
 
 
-
-
+function isFixedIfNumeric(value, fixedTo){
+	if($.isNumeric(value)) return value.toFixed(fixedTo) + "ms"; 
+	else return value; 
 }

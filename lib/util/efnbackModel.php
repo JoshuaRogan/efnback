@@ -3,7 +3,7 @@
  *
  * 		Author: Josh Rogan
  *		Version: 1.0
- *		Date Last Modified: Jan 2015
+ *		Date Last Modified: Feb 2015
  */
 class efnbackModel{
 
@@ -12,21 +12,15 @@ class efnbackModel{
 	public $user_id; 
 	public $test_id; //Id for this test 
 
-	public $accuracy_m; // The overall accuracy from all the the individual tests 
-	public $accuracy_aba; // The overall accuracy from all the the individual tests 
-	public $avg_time_m; //The overal average response time in ms
-	public $avg_time_aba; //The overal average response time in ms
+	public $stats; //Test_stats object 
 
-	public function __construct($session_id, $user_id, $accuracy_m, $avg_reaction_time_m, $accuracy_aba, $avg_reaction_time_aba){
+	public function __construct($session_id, $user_id, $stats){
 		$this->mysql = new mySQL(); //establish connection to mysql
 
 		$this->session_id = $session_id;
 		$this->user_id = $user_id;
+		$this->stats = $stats; 
 
-		$this->accuracy_m = $accuracy_m;
-		$this->accuracy_aba = $accuracy_aba;
-		$this->avg_time_m = $avg_reaction_time_m;
-		$this->avg_time_aba = $avg_reaction_time_aba;
 
 		//Check if there is a valid session if not create one 
 		if(!$this->checkSession()){
@@ -103,27 +97,21 @@ class efnbackModel{
 	}		
 
 	/**
-	 *	Create a new test for this user 
+	 *	Create a new test for this user using the stats object 
 	 *
 	 */
 	public function create_test(){
-		if(!is_numeric($this->avg_time_aba)) $this->avg_time_aba = -1;
-		if(!is_numeric($this->avg_time_m)) $this->avg_time_m = -1;
-
-
-		$query = "INSERT INTO tests VALUES($this->test_id, $this->user_id, NOW(), $this->avg_time_m, $this->accuracy_m, $this->avg_time_aba, $this->accuracy_aba)";
+		$query = "INSERT INTO tests VALUES($this->test_id, $this->user_id, NOW(), {$this->stats->enumerate_values_SQL()})";
 		echo $query; 
 		$results = $this->mysql->query($query);
 	}
 
 	/**
-	 *	Insert the actual 
+	 *	Insert the actual task 
 	 *
 	 */
 	public function add_task($block_type, $letter_type, $is_correct, $reaction_time = -1){
 		$query = "INSERT INTO tasks VALUES(NULL, $this->user_id, $this->test_id, '$block_type', '$letter_type', $is_correct, $reaction_time)";
-		echo $query; 
-		
 		$results = $this->mysql->query($query);
 
 	}
@@ -136,5 +124,6 @@ class efnbackModel{
 
 
 }
+
 
 ?>

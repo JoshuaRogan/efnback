@@ -11,16 +11,30 @@
 		$json_string = $_POST['data'];
 
 		$data = json_decode($json_string);
+		$stats = new test_stats(); 
 
-		//Entire test data 
-		$avg_time_m = $data->avgTimeM;
-		$avg_time_aba = $data->avgTimeABA;
-		$accuracy_m = $data->accuracyM;
-		$accuracy_aba = $data->accuracyABA;
 		$session_id = $data->sessionID;
 		$user_id = $data->userID;
+		
+		//0back
+		$stats->avg_reaction_time_m_no_faces = $data->stats->mNoFacesAvgTime;
+		$stats->accuracy_m_no_faces = $data->stats->mNoFacesAccuracy;
+		$stats->avg_reaction_time_m_faces = $data->stats->mFacesAvgTime;
+		$stats->accuracy_m_faces = $data->stats->mFacesAccuracy;
 
-		$model = new efnbackModel($session_id, $user_id, $accuracy_m, $avg_time_m,$accuracy_aba, $avg_time_aba); 
+		//2back
+		$stats->avg_reaction_time_aba_no_faces = $data->stats->ABANoFacesAvgTime;
+		$stats->accuracy_aba_no_faces = $data->stats->ABANoFacesAccuracy;
+		$stats->avg_reaction_time_aba_faces = $data->stats->ABAFacesAvgTime;
+		$stats->accuracy_aba_faces = $data->stats->ABAFacesAccuracy;
+
+		//Faces-NoFaces
+		$stats->avg_reaction_time_faces = $data->stats->facesAvgTime;
+		$stats->accuracy_faces = $data->stats->facesAccuracy;
+		$stats->avg_reaction_time_no_faces = $data->stats->noFacesAvgTime;
+		$stats->accuracy_no_faces = $data->stats->noFacesAccuracy;
+
+		$model = new efnbackModel($session_id, $user_id, $stats); 
 
 
 		foreach($data->blocks as $block){
