@@ -13,8 +13,8 @@ AddType application/octet-stream .zip .mp3 .mp4
 
 
 <IfModule pagespeed_module>
-    ModPagespeed off
-    #ModPagespeedEnableFilters remove_comments,move_css_to_head,rewrite_css
+    ModPagespeed on
+    ModPagespeedEnableFilters remove_comments,move_css_to_head,rewrite_css
 </IfModule>
 
 # ##############################################################################
