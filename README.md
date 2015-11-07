@@ -2,7 +2,7 @@ EFNBack Program
 ==============
 JavaScript application that records the reaction time of the user under different stimuli. Developed for UPMC and the National Neuroscience Curriculum Initiative.  
 
-Built with native JavaScript to be run in the browser. 
+Built with native JavaScript to be run in the browser with a mobile first philosophy. 
 
 View a demo here: [efnback.droplet.joshuarogan.com](http://efnback.droplet.joshuarogan.com).
 
