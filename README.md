@@ -1,13 +1,18 @@
 EFNBack Program 
 ==============
-JavaScript application that records the pressing of the mouse/tapping of finger when certain sequences of letters appear. View the project in development here: [efnback.melwood.jcubedworld.com](http://efnback.melwood.jcubedworld.com). Production Link here [efnback.nncionline.org](http://efnback.nncionline.org/)
+JavaScript application that records the reaction time of the user under different stimuli. Developed for UPMC and the National Neuroscience Curriculum Initiative.  
+
+Built with native JavaScript to be run in the browser. 
+
+View a demo here: [efnback.droplet.joshuarogan.com](http://efnback.droplet.joshuarogan.com).
 
 
 Test Types
 --------------
-- 2 memory conditions: 0 back (press to M) and 2 back (A-B-A pattern).
-- 4 face conditions: no face, fear face, happy face, neutral face. 
+Different tests types to simulate different stimuli. 
 
+- 2 Memory conditions: 0 back (press to M) and 2 back (A-B-A pattern).
+- 4 Face conditions: no face, fear face, happy face, neutral face. 
 
 
 Third Party Components 
