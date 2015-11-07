@@ -9,9 +9,9 @@
 		<div id="instructions">
 		<img class='img-responsive center-block' src='/img/faces/happy/happy-<?php echo rand(1,16); ?>.jpg' alt='preloading' width='150'>
 
-		<p>Psychology application for <a href="http://www.upmc.com/Pages/default.aspx" target="_blank">UPMC</a> to test reaction time compared to viewing faces on screen showing different emotions. </p>
+		<p>Psychology application for <a href="http://www.upmc.com/Pages/default.aspx" target="_blank">UPMC</a> to test reaction time compared to viewing emotional stimuli on screen. </p>
 
-		<p><strong>Full Test </strong>- Each individual test lasts 3.5s and the target letter appears for 0.5s.  Results will be showed at the end of the test. Test lasts about 20 minutes.</p>
+		<p><strong>Full Test </strong>- Each individual test lasts 3.5s and the target letter appears for 0.5s.  Results will be displayed at the end of the test. The entire test lasts about 20 minutes.</p>
 		<p><strong>Quick Test</strong> - The test is simulated at <em>hyper speed</em> to quickly see how the application works.</p>
 		
 		<p><small>This is for demonstration only</small></p>
