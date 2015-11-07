@@ -15,36 +15,36 @@ class efnbackModel{
 	public $stats; //Test_stats object 
 
 	public function __construct($session_id, $user_id, $stats){
-		$this->mysql = new mySQL(); //establish connection to mysql
+		// $this->mysql = new mySQL(); //establish connection to mysql
 
-		$this->session_id = $session_id;
-		$this->user_id = $user_id;
-		$this->stats = $stats; 
+		// $this->session_id = $session_id;
+		// $this->user_id = $user_id;
+		// $this->stats = $stats; 
 
 
 		//Check if there is a valid session if not create one 
-		if(!$this->checkSession()){
-			$this->createSession();
-			echo "SESSION JUST CREATED\n"; 
-		}
-		else {
-			echo "SESSION ALREADY CREATED\n"; 
-		}
+		// if(!$this->checkSession()){
+		// 	// $this->createSession();
+		// 	echo "SESSION JUST CREATED\n"; 
+		// }
+		// else {
+		// 	echo "SESSION ALREADY CREATED\n"; 
+		// }
 	
 
-		//Check if there is a valid user if not create one 
-		if(!$this->checkUser()){
-			$this->createUser(); 
-			echo "USER JUST CREATED\n"; 
-		}
-		else{
-			echo "USER ALREADY CREATED\n";
-		}
+		// //Check if there is a valid user if not create one 
+		// if(!$this->checkUser()){
+		// 	$this->createUser(); 
+		// 	echo "USER JUST CREATED\n"; 
+		// }
+		// else{
+		// 	echo "USER ALREADY CREATED\n";ef
+		// }
 
 
 		//Check to get the valid test id 
-		$this->test_id = $this->get_test_id(); 
-		$this->create_test(); //Create the new test into the databse 
+		// $this->test_id = $this->get_test_id(); 
+		// $this->create_test(); //Create the new test into the databse 
 
 	}
 
@@ -53,7 +53,8 @@ class efnbackModel{
 	 *		-Returns truw or false 
 	 */
 	public function checkSession(){
-		return $this->mysql->exists($this->session_id, 'sessions'); 
+		// return $this->mysql->exists($this->session_id, 'sessions'); 
+		return true; 
 	}
 
 	//Create a new session

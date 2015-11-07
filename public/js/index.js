@@ -1,10 +1,10 @@
 $(document).ready(function() {
-	$.getJSON( "/get_blocks", function( data ) {
+	$.getJSON( "/get_blocks?page=get_blocks", function( data ) {
 		$("#loading").addClass("hidden"); 
 		$("#loading").html(""); 
 
 		//Suggest what the session and user id's may be
-		suggestIDs();
+		// suggestIDs();
 
 
 
@@ -13,6 +13,7 @@ $(document).ready(function() {
 		
 		
 		var valid = false; //Make sure the form is valid before starting the task 
+		var quickTest = false;
 		//Bind the button to the handler 
 		$('html').on('vmousedown tap ',function(event) {
 			if(valid) event.preventDefault(); //Only prevent the default action if the form isn't showing 
@@ -30,8 +31,14 @@ $(document).ready(function() {
 					//Store the session and user id into local storage for later retreival
 					sessionStorage.setItem("sessionID", sessionID);
 					sessionStorage.setItem("userID", userID);
-
-					efnback.start(sessionID, userID); //Start the task 
+					
+					if(quickTest){
+						efnback.start(sessionID, userID, true);
+					}
+					else{
+						efnback.start(sessionID, userID, false); 
+					}
+					
 					$("#test-variables").addClass("hidden");
 					$("#test-variables").html("");
 
@@ -48,9 +55,23 @@ $(document).ready(function() {
 
 			var sessionID = $("#sessionID").val();
 			var userID = $("#userID").val();
+			quickTest = false;
 
 			if(validForm(sessionID, userID)) valid = true; 
 		}); 
+
+		//Submit the form 
+		$("#quick-test").on('vmousedown', function(event){
+			console.log("test submitted");
+
+			var sessionID = $("#sessionID").val();
+			var userID = $("#userID").val();
+			quickTest = true; 
+
+			if(validForm(sessionID, userID)) valid = true; 
+		}); 
+
+
 
 		//Generate a unique user id 
 		$("#generate-uid").on('vmousedown', function(event){

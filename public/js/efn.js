@@ -12,6 +12,12 @@
  
 var DEBUG = false; //Debugging mode 
 
+//Timer Quick Override 
+var letterShowTimeMS = 500; //Time that each letter appears on the screen
+var plusSignTimeMS = 3500; //Time that the + sign appears on the screen
+var directionsTimeMS = 3500; //Show the directions for 3.5s
+
+
  function efnback(json){
  	var efnback = efnback || {};
 
@@ -75,10 +81,16 @@ var DEBUG = false; //Debugging mode
  	 * 		-Uses SetInterval to avoid blocking
  	 *
  	 */
- 	 this.start = function(sessionID, userID){
+ 	 this.start = function(sessionID, userID, quickTest){
  	 	this.started = true; 
  	 	this.sessionID = sessionID;
  	 	this.userID = userID;
+
+ 	 	if(quickTest){
+ 	 		letterShowTimeMS = 5; //Time that each letter appears on the screen
+			plusSignTimeMS = 35; //Time that the + sign appears on the screen
+			directionsTimeMS = 35;
+ 	 	}
 
 		var self = this; //Loses scope in setInterval
 		var myInterval = setInterval(function () {
@@ -466,10 +478,6 @@ function block(id, json_block){
 function test(id, letter, isTarget, blockType, faceType){ 
 	var test = test || {};
 
-	test.letterShowTimeMS = 500; //Time that each letter appears on the screen
-	test.plusSignTimeMS = 3500; //Time that the + sign appears on the screen
-	test.directionsTimeMS = 3500; //Show the directions for 3.5s
-
 	this.id = id; //A unique identifier for this test (order of the items)
 
 	this.letter = letter; //The letter for this test 
@@ -529,11 +537,11 @@ function test(id, letter, isTarget, blockType, faceType){
 							}
 						}
 						self.stop(); //Finish the test
-					},test.plusSignTimeMS);
+					},plusSignTimeMS);
 
-				}, test.letterShowTimeMS);
+				}, letterShowTimeMS);
 
-			}, test.directionsTimeMS);
+			}, directionsTimeMS);
 
 		}
 		else{//All other tests 
@@ -557,9 +565,9 @@ function test(id, letter, isTarget, blockType, faceType){
 					}
 
 					self.stop(); //Finish the test
-				},test.plusSignTimeMS);
+				},plusSignTimeMS);
 
-			}, test.letterShowTimeMS);
+			}, letterShowTimeMS);
 
 		}
 

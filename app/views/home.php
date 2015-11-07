@@ -5,23 +5,33 @@
 	</div>
 
 	<div id="instructions_container" class="col-xs-12"> 
-		<p id="instructions">Please add your session and ID number to the form below. If this is the first time taking the test click "Generate User ID". <br/> <strong> Make sure to remember the user id! </strong></p>
+
+		<div id="instructions">
+		<img class='img-responsive center-block' src='/img/faces/happy/happy-<?php echo rand(1,16); ?>.jpg' alt='preloading' width='150'>
+
+		<p>Psychology application for <a href="http://www.upmc.com/Pages/default.aspx" target="_blank">UPMC</a> to test reaction time compared to viewing faces on screen showing different emotions. </p>
+
+		<p><strong>Full Test </strong>- Each individual test lasts 3.5s and the target letter appears for 0.5s.  Results will be showed at the end of the test. Test lasts about 20 minutes.</p>
+		<p><strong>Quick Test</strong> - The test is simulated at <em>hyper speed</em> to quickly see how the application works.</p>
+		
+		<p><small>This is for demonstration only</small></p>
 	</div>
 
 	<div id="test-variables"> 
-		<div id="form-errors"> </div>
+		<div id="form-errors hidden"> </div>
 		<form class="form-inline">
-		<div class="form-group">
+		<div class="form-group hidden">
 			<label for="sessionID">Session ID</label>
-			<input type="text" class="form-control" id="sessionID" name="sessionID" placeholder="Session ID" required >
+			<input type="text" class="form-control" id="sessionID" name="sessionID" placeholder="Session ID" value='1234567' >
 		</div>
-		<div class="form-group">
+		<div class="form-group hidden">
 			<label for="userID">User ID</label>
-			<input type="text" class="form-control" id="userID" placeholder="User ID" required >
+			<input type="text" class="form-control" id="userID" placeholder="User ID" value='1234567' >
 		</div>
 		<br/>
-			<button type="button" class="btn btn-default" id="start-test">Start the Test!</button>
-			<button type="button" class="btn btn-success" id="generate-uid">Generate User ID</button>
+			<button type="button" class="btn btn-success" id="quick-test">High Speed Test</button>
+			<button type="button" class="btn btn-danger" id="start-test">Take the Test (~20 Min)</button>
+			<button type="button" class="btn btn-success hidden" id="generate-uid">Full Test (~20 Min)</button>
 		</form>
 	</div>
 
