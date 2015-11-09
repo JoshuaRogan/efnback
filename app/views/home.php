@@ -29,9 +29,9 @@
 			<input type="text" class="form-control" id="userID" placeholder="User ID" value='1234567' disabled>
 		</div>
 		<div class='center-block' style='padding-top: 10px;'>
-			<button type="button" class="btn btn-success" id="quick-test">High Speed Test</button>
-			<button type="button" class="btn btn-danger" id="start-test">Take the Test (~20 Min)</button>
-			<button type="button" class="btn btn-success hidden" id="generate-uid">Full Test (~20 Min)</button>
+			<button type="button" class="btn btn-danger" id="quick-test"><strong>High Speed Test</strong></button>
+			<button type="button" class="btn btn-success" id="start-test"><strong>Take the Test (~20 Min)</strong></button>
+			<button type="button" class="btn btn-success hidden" id="generate-uid" >Full Test (~20 Min)</button>
 		</div>
 		</form>
 	</div>
