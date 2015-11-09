@@ -14,24 +14,25 @@
 		<p><strong>Full Test </strong>- Each individual test lasts 3.5s and the target letter appears for 0.5s.  Results will be displayed at the end of the test. The entire test lasts about 20 minutes.</p>
 		<p><strong>Quick Test</strong> - The test is simulated at <em>hyper speed</em> to quickly see how the application works.</p>
 		
-		<p><small>This is for demonstration only</small></p>
+		<p><small class='text-warning'>This is for demonstration only</small></p>
 	</div>
 
-	<div id="test-variables"> 
-		<div id="form-errors hidden"> </div>
+	<div id="test-variables" class='center-block'> 
+		<div id="form-errors"> </div>
 		<form class="form-inline">
-		<div class="form-group hidden">
+		<div class="form-group">
 			<label for="sessionID">Session ID</label>
-			<input type="text" class="form-control" id="sessionID" name="sessionID" placeholder="Session ID" value='1234567' >
+			<input type="text" class="form-control" id="sessionID" name="sessionID" placeholder="Session ID" value='1234567' disabled>
 		</div>
-		<div class="form-group hidden">
+		<div class="form-group">
 			<label for="userID">User ID</label>
-			<input type="text" class="form-control" id="userID" placeholder="User ID" value='1234567' >
+			<input type="text" class="form-control" id="userID" placeholder="User ID" value='1234567' disabled>
 		</div>
-		<br/>
+		<div class='center-block' style='padding-top: 10px;'>
 			<button type="button" class="btn btn-success" id="quick-test">High Speed Test</button>
 			<button type="button" class="btn btn-danger" id="start-test">Take the Test (~20 Min)</button>
 			<button type="button" class="btn btn-success hidden" id="generate-uid">Full Test (~20 Min)</button>
+		</div>
 		</form>
 	</div>
 
